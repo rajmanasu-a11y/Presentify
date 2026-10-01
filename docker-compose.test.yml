@@ -1,0 +1,10 @@
+# Test-only additions: exposes the database and Auth on localhost so the
+# automated tests can prepare data and inspect results. Never use in production.
+#   scripts/test.sh   (starts a separate "presentify-test" stack and runs all tests)
+services:
+  db:
+    ports:
+      - "127.0.0.1:${TEST_DB_PORT:-54322}:5432"
+  auth:
+    ports:
+      - "127.0.0.1:${TEST_AUTH_PORT:-54399}:9999"

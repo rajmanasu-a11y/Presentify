@@ -1,0 +1,9 @@
+{
+  "name": "presentify-tools",
+  "private": true,
+  "type": "module",
+  "description": "Presentify administrative commands: database migrations and Super Admin creation",
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

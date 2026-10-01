@@ -1,6 +1,6 @@
 # Presentify — Final Requirements Specification (v1)
 
-> **Status:** for owner confirmation. Implementation starts after confirmation.
+> **Status:** **confirmed by the owner on 01-10-2026.** Laptop: Windows 11, 16 GB RAM.
 > Background analysis, questions and lessons from the earlier version: [00-DISCOVERY.md](00-DISCOVERY.md) (this document supersedes it where they differ).
 
 **Product:** Presentify — *Present. Scan. Access.* — "One Presentation. One QR Code. Zero Unnecessary Paper."
@@ -173,8 +173,8 @@ Before "Application completed": a table `Requirement | Implemented | Tested | No
 
 ---
 
-## 11. Open item
+## 11. Resolved items
 
-| Item | Needed for | Default if not answered |
-|---|---|---|
-| Laptop operating system and RAM | Stage 1 installation guide | Windows 11, 16 GB RAM, Docker Desktop (WSL 2) |
+| Item | Answer |
+|---|---|
+| Laptop operating system and RAM | Windows 11, 16 GB RAM (Docker Desktop with WSL 2) |

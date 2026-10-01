@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="#0B2E5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <!-- QR finder patterns -->
+  <rect x="9.5" y="3.5" width="14" height="14" rx="1"/>
+  <rect x="14.5" y="8.5" width="4" height="4" fill="#0B2E5C" stroke="none"/>
+  <rect x="40.5" y="3.5" width="14" height="14" rx="1"/>
+  <rect x="45.5" y="8.5" width="4" height="4" fill="#0B2E5C" stroke="none"/>
+  <!-- QR modules -->
+  <g fill="#0B2E5C" stroke="none">
+    <rect x="28" y="2" width="3.5" height="3.5"/><rect x="33" y="5" width="3.5" height="3.5"/>
+    <rect x="28" y="10" width="3.5" height="3.5"/><rect x="33" y="14" width="3.5" height="3.5"/>
+    <rect x="8" y="21" width="3.5" height="3"/><rect x="15" y="21" width="3.5" height="3"/>
+    <rect x="22" y="21" width="3.5" height="3"/><rect x="29" y="21" width="3.5" height="3"/>
+    <rect x="38" y="21" width="5" height="3"/><rect x="47" y="21" width="8" height="3"/>
+  </g>
+  <!-- projector screen on a tripod -->
+  <path d="M7 27.5h50"/>
+  <rect x="10" y="27.5" width="43" height="21"/>
+  <path d="M7 48.5h50"/>
+  <path d="M32 48.5v12M32 53l-7 7M32 53l7 7"/>
+</svg>

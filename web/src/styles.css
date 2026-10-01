@@ -1,0 +1,39 @@
+/* Accessibility helpers and global defaults. */
+html { -webkit-text-size-adjust: 100%; }
+body { background: var(--mantine-color-gray-0); }
+
+.skip-link {
+  position: absolute; left: 8px; top: -60px; z-index: 1000;
+  background: var(--mantine-color-navy-7); color: #fff; padding: 10px 16px; border-radius: 6px;
+  font-weight: 600; text-decoration: none;
+}
+.skip-link:focus { top: 8px; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* Kannada text needs a little more line height to stay readable. */
+:lang(kn) body, :lang(kn) .mantine-Text-root { line-height: 1.65; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* Secondary ("dimmed") text: Mantine's default grey is below the WCAG AA contrast
+   ratio of 4.5:1, so use a darker grey (≈ 6:1 on white). */
+:root[data-mantine-color-scheme] {
+  --mantine-color-dimmed: #545b62;
+  --mantine-color-placeholder: #6c737a;
+}
+
+/* Text on light-tinted badges and alerts: darker shades so every status label
+   meets WCAG AA (4.5:1) on its tinted background. */
+:root[data-mantine-color-scheme] {
+  --mantine-color-green-light-color: #1d6a2f;
+  --mantine-color-orange-light-color: #9c3a0a;
+  --mantine-color-red-light-color: #a11d1d;
+  --mantine-color-yellow-light-color: #7a5200;
+  --mantine-color-blue-light-color: #1c4f8f;
+}

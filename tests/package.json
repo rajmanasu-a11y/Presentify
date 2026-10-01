@@ -1,0 +1,16 @@
+{
+  "name": "presentify-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:api": "node --test --test-concurrency=1 \"api/*.test.mjs\"",
+    "test:e2e": "playwright test -c playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "1.63",
+    "@supabase/supabase-js": "^2.117.2",
+    "otplib": "^13.5.0",
+    "pg": "^8.23.1"
+  }
+}
