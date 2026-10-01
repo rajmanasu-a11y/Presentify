@@ -1,6 +1,6 @@
 # Presentify — technical architecture (as implemented)
 
-Status: **Phase 1** (foundation). Later phases extend this document.
+Status: **Phases 1–2** (foundation; meetings and content). Later phases extend this document.
 
 ## Services
 
@@ -31,7 +31,7 @@ tools    (on demand) create-superadmin, migration-status
 | `docker/db/` | first-boot database scripts (role passwords, JWT expiry) |
 | `docker/certs/` | optional organisation root certificates for builds behind HTTPS inspection |
 | `supabase/migrations/` | Presentify schema (append-only, checksummed) |
-| `supabase/functions/` | `main` router, `_shared` helpers, `manage-users` |
+| `supabase/functions/` | `main` router, `_shared` helpers, `manage-users`, `uploads` |
 | `tools/` | migration runner and Super Admin creation (Node) |
 | `web/` | React + TypeScript + Mantine screens; `web/nginx/` gateway config |
 | `tests/api/` | API / security / database tests (node:test) |
@@ -47,6 +47,43 @@ audit_logs (append-only)    login_events    system_settings    app.auth_failures
 storage bucket "branding": <organisation_id>/<file>
 ```
 
+## Data model (Phase 2)
+
+```
+presenters ─┐ (optional link to a PRESENTER login of the same organisation)
+meetings 1─* meeting_sessions *─1 presenters        meeting_counters (MTG-<year>-0001 per organisation)
+meeting_sessions 1─* presentations 1─* presentation_versions ─▶ stored_files (original, PDF viewing copy)
+meeting_sessions 1─* attachments ─▶ stored_files (file, PDF viewing copy)
+stored_files: metadata of every upload; bytes in the private "content" bucket
+```
+
+Child tables carry `organisation_id` and use **composite foreign keys** `(organisation_id, parent_id)`, so a row can
+never point at another organisation's record. Statuses: `DRAFT → PUBLISHED → ARCHIVED`; *Scheduled / Active /
+Completed* are derived from the meeting times. Archived meetings are read-only until restored.
+
+| Who | Sees | Changes |
+|---|---|---|
+| Organisation Admin | all meetings of the organisation | all meetings, sessions, material; restores versions |
+| Organiser | all meetings of the organisation | meetings they organise (if allowed to create meetings) |
+| Presenter (login) | only meetings in which they present | uploads material to their own sessions |
+
+### Upload workflow
+
+```
+browser ──start──▶ uploads fn ──rpc begin_upload (as the person)──▶ DB: permission, archived?, file type
+                                                                      (organisation allow-list), size limit,
+                                                                      storage quota → reserve (PENDING)
+        ◀── signed upload link (60 s) ──
+browser ──PUT bytes──▶ storage (private bucket; direct uploads by users are not allowed)
+browser ──finish──▶ uploads fn: reads first 4 KB → real size, stored content type, signature bytes
+                    (%PDF, ZIP/OOXML, OLE, JPEG, PNG, MP4) ──rpc finalize_upload (service)──▶ DB re-checks
+                    size & quota, records version / attachment / PDF copy, or REJECTS
+                    rejected bytes are deleted immediately
+```
+
+Replacing a file never overwrites: each upload is a new version; *restore* records a new version that points to the
+earlier files. Removing a presentation or document deletes its files and frees storage (audit record kept).
+
 ## Security model
 
 | Concern | Implementation |
@@ -60,8 +97,8 @@ storage bucket "branding": <organisation_id>/<file>
 | Sign-in | Supabase Auth with sign-up disabled; password policy (≥10, upper, lower, digit); session inactivity timeout (30 min) and maximum lifetime (12 h); refresh-token rotation. Database hooks: lockout after 5 failures for 15 minutes (configurable), MFA-code lockout, deactivated user/organisation blocking, login events. |
 | Server functions | Router verifies the token signature; `manage-users` re-checks the session with Auth and the caller's role/organisation in the database; the service key never leaves the server. Actions are attributed to the real person via a header that the gateway strips from browser requests and the database trusts only for service-role calls. |
 | Audit | Row-change triggers record old/new values, actor, IP and browser; records cannot be updated, deleted or truncated (only IP/browser blanking for retention). |
-| Gateway | CSP (`script-src 'self'`), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy; `/auth/v1/admin` blocked; rate limits (sign-in 30/min/IP, API 50 r/s, functions 20 r/s). |
-| Files | Private buckets only; branding accepts PNG/JPEG/WebP ≤ 2 MB; storage policies restrict paths to the caller's organisation. |
+| Gateway | CSP (`script-src 'self'`), X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy; `/auth/v1/admin` blocked; rate limits (sign-in 30/min/IP — `SIGNIN_RATE_PER_MINUTE` — API 50 r/s, functions 20 r/s) answered with a JSON message. |
+| Files | Private buckets only; branding accepts PNG/JPEG/WebP ≤ 2 MB; content uploads only through the upload workflow above (type allow-list, size and quota limits, content-signature and content-type checks); reading requires the meeting to be visible to the person; stored files are served with `nosniff`. |
 | Accessibility | WCAG 2.1 AA colour contrast enforced by automated axe checks; skip link; keyboard focus rings; labelled controls. |
 
 ## Known limitations (Phase 1)

@@ -12,9 +12,9 @@ KEEP_STACK=1 scripts/test.sh   # leave the test stack running afterwards
 Browser tests need Chromium: `cd tests && npx playwright install chromium` once, or set
 `PW_CHROMIUM_PATH` to an installed Chromium.
 
-## What is tested (Phase 1)
+## What is tested (Phases 1–2)
 
-**API / security / database** (`tests/api`, 49 tests)
+**API / security / database** (`tests/api`, 84 tests)
 
 | File | Covers |
 |---|---|
@@ -22,8 +22,10 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
 | `02-tenancy` | organisation admins see/change only their organisation (organisations, settings, profiles, limits, usage, staff); cannot create organisations or change package/limits/status/expiry; organisers' restrictions; no direct writes to profiles/audit/system settings; Super Admin sees all; Super Admin without MFA sees nothing |
 | `03-users-and-limits` | temporary password and forced change; password policy; duplicate e-mail; input validation; administrator and user limits enforced by the server (no orphan logins); Super Admin raises limits; no self-deactivation/self-demotion; deactivation blocks sign-in and existing tokens; temporary password reset; role changes; own-profile updates; deactivated organisation; grace period; view-only after grace; retention vs package |
 | `04-signin-audit-storage` | lockout after 5 failures (even with the right password) and login events; MFA reset; audit actor/old-new values/IP; audit records immutable (update/delete/truncate); audit visibility per organisation; actor header cannot be spoofed; branding upload/read limited to own organisation; only images accepted; usage reporting |
+| `05-meetings-content` | presenter directory isolation; automatic meeting numbers; time validation; organiser/admin/presenter rights; no hand-over by organisers; cross-organisation invisibility; no publishing without sessions; archive is read-only and restorable; deleting only empty drafts; PDF and PowerPoint uploads, PDF copies, versions and restore; presenters cannot restore; supporting material; presenters upload only to their own sessions; disallowed types (exe, html, svg, js, no extension); disguised web page rejected and deleted; wrong content type; file-size limit (declared and actual); storage quota; removal frees space; upload acceptance not callable from browsers; no direct storage uploads; file access by organisation and by meeting; meeting/presentation limits; audit attribution |
+| `99-rate-limit` | rapid sign-in attempts are refused with a JSON message and `Retry-After` (runs last) |
 
-**Browser** (`tests/e2e`, Playwright, 8 tests)
+**Browser** (`tests/e2e`, Playwright, 10 tests)
 
 - sign-in page: accessibility (axe, WCAG 2 A/AA, no serious/critical issues), English ⇄ Kannada
 - wrong password message
@@ -32,7 +34,9 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
 - Organisation Admin: first sign-in, console blocked, profile, logo upload, registration fields, add organiser, audit log, Kannada interface
 - dashboard accessibility
 - phone layout (Pixel 7): no sideways scrolling, touch-size buttons
+- meeting journey: presenter directory, meeting from the dashboard, publishing refused without sessions, session with presenter, PowerPoint upload + PDF copy, disguised file refused with a plain message, supporting document, new version with notes, version history and restore, publish, accessibility of the meeting page
+- the meeting appears on the dashboard, in Presentations and in Meetings
 
 ## Results
 
-See [PHASE-1-REPORT.md](PHASE-1-REPORT.md) for the latest run.
+See [PHASE-2-REPORT.md](PHASE-2-REPORT.md) for the latest run.

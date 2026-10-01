@@ -1,8 +1,8 @@
 import { Alert, AppShell, Avatar, Box, Burger, Group, Menu, NavLink, Text, UnstyledButton, VisuallyHidden } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
-  IconBuilding, IconChevronDown, IconClipboardList, IconHelp, IconLayoutDashboard, IconLogout, IconPackage,
-  IconSettings, IconUserCircle, IconUsers,
+  IconBuilding, IconCalendarEvent, IconChevronDown, IconClipboardList, IconHelp, IconLayoutDashboard, IconLogout, IconPackage,
+  IconPresentation, IconSettings, IconUserCircle, IconUsers, IconUserStar,
 } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,9 @@ function useNavItems(): NavItem[] {
     ];
   }
   const items: NavItem[] = [{ to: '/', label: t('nav.dashboard'), icon: i(IconLayoutDashboard), exact: true }];
+  if (can('MEETING_VIEW')) items.push({ to: '/meetings', label: t('nav.meetings'), icon: i(IconCalendarEvent) });
+  if (can('MEETING_VIEW')) items.push({ to: '/presentations', label: t('nav.presentations'), icon: i(IconPresentation) });
+  if (can('PRESENTER_MANAGE')) items.push({ to: '/presenters', label: t('nav.presenters'), icon: i(IconUserStar) });
   if (can('ORG_PROFILE_EDIT')) items.push({ to: '/organisation', label: t('nav.organisation'), icon: i(IconBuilding) });
   if (can('USER_MANAGE')) items.push({ to: '/users', label: t('nav.users'), icon: i(IconUsers) });
   if (can('AUDIT_VIEW')) items.push({ to: '/audit', label: t('nav.audit'), icon: i(IconClipboardList) });

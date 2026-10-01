@@ -125,3 +125,60 @@ export async function createStaff(adminClient, orgId, role, extra = {}) {
 export async function closeAll() {
   await db.end();
 }
+
+// ---- Phase 2 helpers --------------------------------------------------------
+export const SAMPLE = {
+  pdf: new TextEncoder().encode('%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n'),
+  pptx: new Uint8Array([0x50, 0x4b, 0x03, 0x04, ...new TextEncoder().encode('[Content_Types].xml fake pptx body')]),
+  html: new TextEncoder().encode('<html><script>alert(document.cookie)</script></html>'),
+};
+
+export const CONTENT_TYPE = {
+  pdf: 'application/pdf',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+};
+
+export function isoAt(daysFromNow, hour, minute = 0) {
+  const d = new Date(Date.now() + daysFromNow * 86400000);
+  const day = new Date(d.getTime() + 5.5 * 3600000).toISOString().slice(0, 10);
+  return new Date(`${day}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+05:30`).toISOString();
+}
+
+export async function createMeeting(client, overrides = {}) {
+  const { data, error } = await client.from('meetings').insert({
+    title: uniqueName('Meeting'), starts_at: isoAt(1, 10), ends_at: isoAt(1, 13), venue: 'Training Hall', ...overrides,
+  }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createSession(client, meetingId, overrides = {}) {
+  const { data, error } = await client.from('meeting_sessions').insert({
+    meeting_id: meetingId, title: uniqueName('Session'), starts_at: isoAt(1, 10), ends_at: isoAt(1, 11), ...overrides,
+  }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+export async function createPresentation(client, sessionId, title = uniqueName('Presentation')) {
+  const { data, error } = await client.from('presentations').insert({ session_id: sessionId, title }).select('*').single();
+  if (error) throw error;
+  return data;
+}
+
+/**
+ * Full upload through the uploads function: start → PUT bytes → finish.
+ * Returns { start, put, finish } responses so tests can inspect each step.
+ */
+export async function upload(client, { purpose, target, name, bytes, contentType, declaredSize, details }) {
+  const start = await fn(client, 'uploads', {
+    action: 'start', purpose, target_id: target, file_name: name, size: declaredSize ?? bytes.length, details,
+  });
+  if (start.status !== 200) return { start };
+  const put = await fetch(`${BASE_URL}${start.body.upload_url}`, {
+    method: 'PUT', headers: { 'Content-Type': contentType ?? start.body.content_type }, body: bytes,
+  });
+  const finish = await fn(client, 'uploads', { action: 'finish', file_id: start.body.file_id });
+  return { start, put, finish };
+}

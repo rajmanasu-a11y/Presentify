@@ -4,13 +4,13 @@ const locale = () => (i18n.language === 'kn' ? 'kn-IN' : 'en-IN');
 
 export function formatDate(value: string | Date | null | undefined): string {
   if (!value) return '—';
-  return new Intl.DateTimeFormat(locale(), { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(value));
+  return new Intl.DateTimeFormat(locale(), { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Kolkata' }).format(new Date(value));
 }
 
 export function formatDateTime(value: string | Date | null | undefined): string {
   if (!value) return '—';
   return new Intl.DateTimeFormat(locale(), {
-    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata',
   }).format(new Date(value));
 }
 
@@ -37,4 +37,30 @@ export function toDateInput(iso: string | null | undefined): string {
   if (!iso) return '';
   const d = new Date(new Date(iso).getTime() + 5.5 * 3600 * 1000);
   return d.toISOString().slice(0, 10);
+}
+
+// ---- India time (UTC+05:30, no daylight saving) -----------------------------
+const IST_OFFSET_MS = 5.5 * 3600 * 1000;
+
+/** ISO instant → { date: 'yyyy-mm-dd', time: 'hh:mm' } in India time. */
+export function toIstParts(iso: string | null | undefined): { date: string; time: string } {
+  if (!iso) return { date: '', time: '' };
+  const d = new Date(new Date(iso).getTime() + IST_OFFSET_MS).toISOString();
+  return { date: d.slice(0, 10), time: d.slice(11, 16) };
+}
+
+/** India-time date + time → ISO instant. */
+export function fromIstParts(date: string, time: string): string {
+  return new Date(`${date}T${time || '00:00'}:00+05:30`).toISOString();
+}
+
+export function formatTime(value: string | Date | null | undefined): string {
+  if (!value) return '—';
+  return new Intl.DateTimeFormat(locale(), {
+    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata',
+  }).format(new Date(value));
+}
+
+export function todayIst(): string {
+  return new Date(Date.now() + IST_OFFSET_MS).toISOString().slice(0, 10);
 }

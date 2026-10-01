@@ -7,7 +7,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-[[ -f .env.test ]] || ENV_FILE=.env.test HTTP_PORT=8090 scripts/setup.sh http://localhost:8090 >/dev/null
+if [[ ! -f .env.test ]]; then
+  ENV_FILE=.env.test HTTP_PORT=8090 scripts/setup.sh http://localhost:8090 >/dev/null
+  # The suites sign in many times a minute; tests/api/99-rate-limit checks the limiter itself.
+  sed -i 's/^SIGNIN_RATE_PER_MINUTE=.*/SIGNIN_RATE_PER_MINUTE=300/' .env.test
+fi
 compose=(docker compose -p presentify-test --env-file .env.test -f docker-compose.yml -f docker-compose.test.yml)
 
 echo "Starting a fresh test stack…"

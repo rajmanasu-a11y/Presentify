@@ -6,9 +6,10 @@ Presentify is a digital presentation-sharing, meeting-attendance and document-di
 training institutions, government offices and corporate meetings. Participants scan one QR code, enter their details and
 view the presentation and supporting material on their own phone — no printed handouts, no app installation.
 
-> **Status: Phase 1 of 6 complete** — foundation (organisations, staff accounts, sign-in with MFA, limits, audit,
-> English/ಕನ್ನಡ). Meetings, QR codes and participant pages follow in the next phases.
-> See [docs/PHASE-1-REPORT.md](docs/PHASE-1-REPORT.md).
+> **Status: Phases 1–2 of 6 complete** — organisations, staff accounts, sign-in with MFA, limits, audit,
+> English/ಕನ್ನಡ; meetings with sessions and presenters, presentation uploads with versions, PDF copies and
+> supporting material. QR codes and participant pages follow in Phase 3.
+> See [docs/PHASE-1-REPORT.md](docs/PHASE-1-REPORT.md) and [docs/PHASE-2-REPORT.md](docs/PHASE-2-REPORT.md).
 
 ## Quick start
 
@@ -40,9 +41,10 @@ React + TypeScript + Mantine · nginx gateway · Docker Compose. Details:
 | [docs/INSTALL-LAPTOP-WINDOWS.md](docs/INSTALL-LAPTOP-WINDOWS.md) | Laptop installation (Windows 11) |
 | [docs/TESTING.md](docs/TESTING.md) | How to run the tests and what they cover |
 | [docs/PHASE-1-REPORT.md](docs/PHASE-1-REPORT.md) | Phase 1 delivery, test results, checklist |
+| [docs/PHASE-2-REPORT.md](docs/PHASE-2-REPORT.md) | Phase 2 delivery, test results, checklist |
 
 ## Tests
 
 ```bash
-scripts/test.sh        # disposable test stack on port 8090: 49 API/security + 8 browser tests
+scripts/test.sh        # disposable test stack on port 8090: 84 API/security + 10 browser tests
 ```

@@ -95,11 +95,11 @@ export function AccountPage() {
 
 export function HelpPage() {
   const { t } = useTranslation();
-  const topics = ['signIn', 'users', 'org', 'locked', 'coming'];
+  const topics = ['meeting', 'upload', 'versions', 'presenter', 'signIn', 'users', 'org', 'locked'];
   return (
     <>
       <PageHeader title={t('help.title')} intro={t('help.intro')} />
-      <Accordion variant="separated" maw={820} multiple defaultValue={['signIn']}>
+      <Accordion variant="separated" maw={820} multiple defaultValue={['meeting']}>
         {topics.map((k) => (
           <Accordion.Item key={k} value={k}>
             <Accordion.Control><Text fw={600}>{t(`help.${k}Title`)}</Text></Accordion.Control>

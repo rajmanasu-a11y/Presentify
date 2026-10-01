@@ -67,7 +67,7 @@ test('Super Admin creates an organisation and its administrator', async ({ page 
 
   orgAdminTemporary = (await page.getByTestId('temp-password').textContent()).trim();
   expect(orgAdminTemporary).toMatch(/^[A-Za-z0-9]{14}$/);
-  await page.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).last().click();
   await expect(page.getByRole('cell', { name: /^Anita Sharma \(DEMO\)/ })).toBeVisible();
 
   // Limits are adjustable by the Super Admin.
@@ -111,7 +111,7 @@ test('Organisation Admin signs in, sets a password and manages the organisation'
   await form.getByRole('radio', { name: 'Organiser' }).check();
   await form.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByTestId('temp-password')).toBeVisible();
-  await page.getByRole('button', { name: 'Close' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Close', exact: true }).last().click();
   await expect(page.getByRole('cell', { name: /^Ravi Kumar \(DEMO\)/ })).toBeVisible();
 
   // The audit log shows what happened.

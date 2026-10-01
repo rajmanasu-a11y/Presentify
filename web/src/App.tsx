@@ -8,6 +8,10 @@ import { AccountPage, HelpPage, NotFoundPage } from './pages/AccountPages';
 
 const OrgPages = () => import('./pages/org/OrgPages');
 const ConsolePages = () => import('./pages/console/ConsolePages');
+const MeetingsPages = () => import('./pages/meetings/MeetingsPage');
+const MeetingDetail = () => import('./pages/meetings/MeetingDetailPage');
+const PresentersPages = () => import('./pages/meetings/PresentersPage');
+const PresentationsPages = () => import('./pages/meetings/PresentationsPage');
 const lazyPage = <M extends Record<string, unknown>>(load: () => Promise<M>, name: keyof M) =>
   lazy(async () => ({ default: (await load())[name] as React.ComponentType }));
 
@@ -15,6 +19,10 @@ const OrgDashboardPage = lazyPage(OrgPages, 'OrgDashboardPage');
 const OrganisationPage = lazyPage(OrgPages, 'OrganisationPage');
 const UsersPage = lazyPage(OrgPages, 'UsersPage');
 const AuditPage = lazyPage(OrgPages, 'AuditPage');
+const MeetingsPage = lazyPage(MeetingsPages, 'MeetingsPage');
+const MeetingDetailPage = lazyPage(MeetingDetail, 'MeetingDetailPage');
+const PresentersPage = lazyPage(PresentersPages, 'PresentersPage');
+const PresentationsPage = lazyPage(PresentationsPages, 'PresentationsPage');
 const ConsoleDashboardPage = lazyPage(ConsolePages, 'ConsoleDashboardPage');
 const OrganisationsPage = lazyPage(ConsolePages, 'OrganisationsPage');
 const OrganisationDetailPage = lazyPage(ConsolePages, 'OrganisationDetailPage');
@@ -61,6 +69,10 @@ export const router = createBrowserRouter([
         element: <AppLayout />,
         children: [
           { index: true, element: <Home /> },
+          { path: 'meetings', element: <Require when={perm('MEETING_VIEW')}><MeetingsPage /></Require> },
+          { path: 'meetings/:id', element: <Require when={perm('MEETING_VIEW')}><MeetingDetailPage /></Require> },
+          { path: 'presentations', element: <Require when={perm('MEETING_VIEW')}><PresentationsPage /></Require> },
+          { path: 'presenters', element: <Require when={perm('PRESENTER_MANAGE')}><PresentersPage /></Require> },
           { path: 'organisation', element: <Require when={perm('ORG_PROFILE_EDIT')}><OrganisationPage /></Require> },
           { path: 'users', element: <Require when={perm('USER_MANAGE')}><UsersPage /></Require> },
           { path: 'audit', element: <Require when={perm('AUDIT_VIEW')}><AuditPage /></Require> },
