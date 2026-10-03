@@ -6,7 +6,7 @@ import { friendlyMessage } from '../lib/errors';
 const closeButtonProps = () => ({ 'aria-label': i18n.t('common.close') });
 
 export const notifySuccess = (message: string) =>
-  notifications.show({ color: 'green', message, autoClose: 4000, closeButtonProps: closeButtonProps() });
+  notifications.show({ color: 'green', message, autoClose: 3000, closeButtonProps: closeButtonProps() });
 
 export const notifyError = (err: unknown) =>
   notifications.show({ color: 'red', message: friendlyMessage(err), autoClose: 8000, closeButtonProps: closeButtonProps() });

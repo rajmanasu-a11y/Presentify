@@ -1,6 +1,6 @@
-import { Alert, Anchor, Card, Group, Radio, Stack, Switch, Tabs, Text } from '@mantine/core';
+import { Alert, Anchor, Button, Card, Group, Tabs, Text } from '@mantine/core';
+import { IconPlayerPlay, IconWand } from '@tabler/icons-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { useAuth } from '../../auth/AuthProvider';
@@ -14,38 +14,11 @@ import { meetingPhase, type Meeting } from '../../lib/types';
 import { NotFoundPage } from '../AccountPages';
 import { MeetingDetailsForm } from './MeetingForm';
 import { PhaseBadge } from './MeetingsPage';
+import { LivePanel } from './LivePanel';
 import { ParticipantsPanel } from './ParticipantsPanel';
 import { QrPanel } from './QrPanel';
 import { SessionsPanel } from './SessionsPanel';
-
-function SharingSettings({ meeting, disabled }: { meeting: Meeting; disabled: boolean }) {
-  const { t } = useTranslation();
-  const qc = useQueryClient();
-  const [busy, setBusy] = useState(false);
-  const save = async (patch: Partial<Meeting>) => {
-    setBusy(true);
-    const { error } = await supabase.from('meetings').update(patch).eq('id', meeting.id);
-    setBusy(false);
-    if (error) notifyError(error);
-    else { await invalidateMeeting(qc, meeting.id); notifySuccess(t('common.saved')); }
-  };
-  return (
-    <Stack gap="xl" maw={720}>
-      <div>
-        <Switch label={t('meetings.downloadsAllowed')} checked={meeting.downloads_allowed} disabled={disabled || busy}
-          onChange={(e) => void save({ downloads_allowed: e.currentTarget.checked })} size="md" />
-        <Alert color="blue" mt="sm">{t('meetings.downloadsHelp')}</Alert>
-      </div>
-      <Radio.Group label={t('meetings.sessionRelease')} value={meeting.session_release}
-        onChange={(v) => void save({ session_release: v as Meeting['session_release'] })}>
-        <Stack mt="xs">
-          <Radio value="ALL" label={t('meetings.releaseAll')} disabled={disabled || busy} />
-          <Radio value="ON_START" label={t('meetings.releaseOnStart')} disabled={disabled || busy} />
-        </Stack>
-      </Radio.Group>
-    </Stack>
-  );
-}
+import { SharingSettings } from './SharingSettings';
 
 export function MeetingDetailPage() {
   const { t } = useTranslation();
@@ -79,6 +52,12 @@ export function MeetingDetailPage() {
           <Group gap="sm">
             <PhaseBadge phase={meetingPhase(m)} />
             {canManage && m.status === 'DRAFT' && (
+              <Button variant="light" component={Link} to={`/meetings/${m.id}/setup?step=2`} leftSection={<IconWand size={18} />}>{t('wizard.continue')}</Button>
+            )}
+            {can('QR_DISPLAY') && m.status === 'PUBLISHED' && (
+              <Button variant="light" component={Link} to={`/present/meetings/${m.id}`} target="_blank" leftSection={<IconPlayerPlay size={18} />}>{t('present.start')}</Button>
+            )}
+            {canManage && m.status === 'DRAFT' && (
               <ConfirmButton message={t('meetings.confirmPublish')} onConfirm={() => setStatus('PUBLISHED', t('meetings.published'))}>{t('meetings.publish')}</ConfirmButton>
             )}
             {canManage && m.status === 'PUBLISHED' && (
@@ -103,6 +82,7 @@ export function MeetingDetailPage() {
         }
       />
       {archived && <Alert color="gray" mb="md">{t('meetings.archivedNotice')}</Alert>}
+      {content.data && <LivePanel meeting={m} sessions={content.data.sessions} />}
       <Tabs defaultValue={initialTab} keepMounted={false}>
         <Tabs.List mb="lg">
           <Tabs.Tab value="sessions">{t('meetings.sessionsTab')}</Tabs.Tab>

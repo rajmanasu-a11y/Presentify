@@ -108,10 +108,8 @@ describe('QR codes', () => {
     assert.equal(await activeQr(meeting.id), qr);
   });
 
-  test('a QR code cannot be made for a draft meeting, or with an expiry in the past', async () => {
-    const draft = await createMeeting(organiserA.client);
-    const a = await organiserA.client.rpc('regenerate_qr', { p_meeting: draft.id });
-    assert.equal(a.error?.hint, 'NOT_PUBLISHED');
+  // (QR codes for drafts — allowed since Phase 4 — are tested in 07-display-live.)
+  test('a QR code cannot be made with an expiry in the past', async () => {
     const b = await organiserA.client.rpc('regenerate_qr', { p_meeting: meeting.id, p_expires_at: new Date(Date.now() - 60000).toISOString() });
     assert.equal(b.error?.hint, 'EXPIRY_PAST');
   });

@@ -32,12 +32,14 @@ test('create a meeting with a presenter, session, presentation, PDF copy and sup
   // Meeting (from the dashboard quick action)
   await page.getByRole('link', { name: 'Dashboard' }).click();
   await page.getByRole('link', { name: 'Create meeting' }).click();
-  dialog = page.getByRole('dialog');
-  await dialog.getByLabel(/^Meeting title/).fill('Senior Officers Training Programme (DEMO)');
+  // (Phase 4: "Create meeting" opens the step-by-step wizard; this test continues on the meeting page.)
+  await page.getByLabel(/^Meeting title/).fill('Senior Officers Training Programme (DEMO)');
   const tomorrow = new Date(Date.now() + 86400000 + 5.5 * 3600000).toISOString().slice(0, 10);
-  await dialog.getByLabel(/^Date/).fill(tomorrow);
-  await dialog.getByLabel(/^Venue/).fill('Training Hall');
-  await dialog.getByRole('button', { name: 'Create' }).click();
+  await page.getByLabel(/^Date/).fill(tomorrow);
+  await page.getByLabel(/^Venue/).fill('Training Hall');
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Step 2: Presenters & sessions' })).toBeVisible();
+  await page.getByRole('link', { name: 'Finish later' }).click();
   await expect(page.getByRole('heading', { name: 'Senior Officers Training Programme (DEMO)' })).toBeVisible();
   await expect(page.getByText(/MTG-\d{4}-\d{4}/)).toBeVisible();
 

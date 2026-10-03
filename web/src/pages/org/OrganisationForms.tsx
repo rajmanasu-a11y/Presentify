@@ -204,6 +204,7 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
       consent_text_kn: settings.consent_text_kn ?? '',
       participant_retention_days: settings.participant_retention_days === null ? 'indefinite' : String(settings.participant_retention_days),
       keep_participant_directory: settings.keep_participant_directory,
+      presenters_see_count: settings.presenters_see_count,
       default_language: settings.default_language,
       allowed_file_types: settings.allowed_file_types,
       downloads_default: settings.downloads_default,
@@ -241,6 +242,7 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
               consent_text_kn: blank(v.consent_text_kn),
               participant_retention_days: v.participant_retention_days === 'indefinite' ? null : Number(v.participant_retention_days),
               keep_participant_directory: v.keep_participant_directory,
+              presenters_see_count: v.presenters_see_count,
               default_language: v.default_language,
             } : section === 'files' ? {
               allowed_file_types: v.allowed_file_types,
@@ -304,6 +306,10 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
               {...form.getInputProps('participant_retention_days')}
             />
             <Switch label={t('org.keepDirectory')} {...form.getInputProps('keep_participant_directory', { type: 'checkbox' })} />
+            <div>
+              <Switch label={t('org.presentersSeeCount')} {...form.getInputProps('presenters_see_count', { type: 'checkbox' })} />
+              <Text fz="sm" c="dimmed" mt={4}>{t('org.presentersSeeCountHelp')}</Text>
+            </div>
             <Radio.Group label={t('org.defaultLanguage')} {...form.getInputProps('default_language')}>
               <Group mt="xs"><Radio value="en" label="English" /><Radio value="kn" label="ಕನ್ನಡ" /></Group>
             </Radio.Group>

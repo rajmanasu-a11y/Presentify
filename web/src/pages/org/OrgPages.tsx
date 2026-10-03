@@ -124,7 +124,7 @@ export function OrgDashboardPage() {
 
   const todayIds = new Set((today.data ?? []).map((m) => m.id));
   const actions = [
-    can('MEETING_MANAGE') && !readOnly && { to: '/meetings?new=1', label: t('dashboard.createMeeting'), icon: <IconCalendarPlus size={26} /> },
+    can('MEETING_MANAGE') && !readOnly && { to: '/meetings/new', label: t('dashboard.createMeeting'), icon: <IconCalendarPlus size={26} /> },
     can('CONTENT_UPLOAD') && { to: '/meetings', label: t('dashboard.uploadPresentation'), icon: <IconUpload size={26} /> },
     can('PRESENTER_MANAGE') && !readOnly && { to: '/presenters?new=1', label: t('dashboard.addPresenter'), icon: <IconUserStar size={26} /> },
     can('USER_MANAGE') && { to: '/users', label: t('dashboard.manageUsers'), icon: <IconUsers size={26} /> },

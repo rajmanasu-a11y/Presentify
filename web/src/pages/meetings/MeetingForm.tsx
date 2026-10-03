@@ -1,4 +1,4 @@
-import { Button, Grid, Group, Modal, Select, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import { Button, Grid, Group, Select, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -11,8 +11,15 @@ import { invalidateMeeting, useStaff } from '../../lib/meetingsApi';
 import { supabase } from '../../lib/supabase';
 import type { Meeting } from '../../lib/types';
 
-/** Create a meeting (modal) or edit its details (inline). */
-export function MeetingDetailsForm({ meeting, onDone, disabled }: { meeting: Meeting | null; onDone?: () => void; disabled?: boolean }) {
+/** Create a meeting (wizard step 1) or edit its details. */
+export function MeetingDetailsForm({ meeting, onDone, onSaved, disabled, submitLabel }: {
+  meeting: Meeting | null;
+  onDone?: () => void;
+  /** Called with the meeting id after saving (instead of opening the meeting page). */
+  onSaved?: (id: string) => void;
+  disabled?: boolean;
+  submitLabel?: string;
+}) {
   const { t } = useTranslation();
   const { me } = useAuth();
   const qc = useQueryClient();
@@ -68,13 +75,13 @@ export function MeetingDetailsForm({ meeting, onDone, disabled }: { meeting: Mee
             if (error) throw error;
             await invalidateMeeting(qc, meeting.id);
             notifySuccess(t('common.saved'));
-            onDone?.();
+            if (onSaved) onSaved(meeting.id); else onDone?.();
           } else {
             const { data, error } = await supabase.from('meetings').insert(row).select('id').single();
             if (error) throw error;
             await qc.invalidateQueries({ queryKey: ['meetings'] });
             notifySuccess(t('meetings.created'));
-            navigate(`/meetings/${data.id}?tab=sessions`);
+            if (onSaved) onSaved(data.id); else navigate(`/meetings/${data.id}?tab=sessions`);
           }
         } catch (err) {
           notifyError(err);
@@ -104,21 +111,9 @@ export function MeetingDetailsForm({ meeting, onDone, disabled }: { meeting: Mee
         </Grid>
         <Group justify="flex-end" mt="lg">
           {onDone && !meeting && <Button variant="default" onClick={onDone}>{t('common.cancel')}</Button>}
-          <Button type="submit" loading={busy}>{meeting ? t('common.saveChanges') : t('common.create')}</Button>
+          <Button type="submit" loading={busy}>{submitLabel ?? (meeting ? t('common.saveChanges') : t('common.create'))}</Button>
         </Group>
       </fieldset>
     </form>
-  );
-}
-
-export function NewMeetingModal({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <Modal opened onClose={onClose} title={t('meetings.new')} size="lg" centered>
-      <Stack>
-        <Text c="dimmed" fz="sm">{t('help.meetingBody')}</Text>
-        <MeetingDetailsForm meeting={null} onDone={onClose} />
-      </Stack>
-    </Modal>
   );
 }

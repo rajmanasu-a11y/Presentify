@@ -23,6 +23,8 @@ const MeetingsPage = lazyPage(MeetingsPages, 'MeetingsPage');
 const MeetingDetailPage = lazyPage(MeetingDetail, 'MeetingDetailPage');
 const PresentersPage = lazyPage(PresentersPages, 'PresentersPage');
 const QrDisplayPage = lazyPage(() => import('./pages/meetings/QrDisplayPage'), 'QrDisplayPage');
+const PresenterModePage = lazyPage(() => import('./pages/meetings/PresenterModePage'), 'PresenterModePage');
+const MeetingWizardPage = lazyPage(() => import('./pages/meetings/MeetingWizardPage'), 'MeetingWizardPage');
 const PresentationsPage = lazyPage(PresentationsPages, 'PresentationsPage');
 const ConsoleDashboardPage = lazyPage(ConsolePages, 'ConsoleDashboardPage');
 const OrganisationsPage = lazyPage(ConsolePages, 'OrganisationsPage');
@@ -68,11 +70,14 @@ export const router = createBrowserRouter([
     children: [
       // Full-screen pages without the menu (projector / print).
       { path: 'display/meetings/:id/qr', element: <Require when={perm('QR_DISPLAY')}><QrDisplayPage /></Require> },
+      { path: 'present/meetings/:id', element: <Require when={perm('QR_DISPLAY')}><PresenterModePage /></Require> },
       {
         element: <AppLayout />,
         children: [
           { index: true, element: <Home /> },
           { path: 'meetings', element: <Require when={perm('MEETING_VIEW')}><MeetingsPage /></Require> },
+          { path: 'meetings/new', element: <Require when={perm('MEETING_MANAGE')}><MeetingWizardPage /></Require> },
+          { path: 'meetings/:id/setup', element: <Require when={perm('MEETING_MANAGE')}><MeetingWizardPage /></Require> },
           { path: 'meetings/:id', element: <Require when={perm('MEETING_VIEW')}><MeetingDetailPage /></Require> },
           { path: 'presentations', element: <Require when={perm('MEETING_VIEW')}><PresentationsPage /></Require> },
           { path: 'presenters', element: <Require when={perm('PRESENTER_MANAGE')}><PresentersPage /></Require> },

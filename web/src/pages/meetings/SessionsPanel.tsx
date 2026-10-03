@@ -14,6 +14,7 @@ import { invalidateMeeting, usePresenters, type PresentationWithVersions } from 
 import { supabase } from '../../lib/supabase';
 import type { Attachment, Meeting, MeetingSession, Presenter, StoredFile } from '../../lib/types';
 import { acceptFor, openStoredFile, removeContent } from '../../lib/upload';
+import { PresenterModal } from './PresentersPage';
 import { UploadButton } from './UploadButton';
 
 const VIEWABLE = ['pdf', 'jpg', 'jpeg', 'png'];
@@ -72,6 +73,7 @@ function SessionModal({ meeting, session, onClose }: { meeting: Meeting; session
   const qc = useQueryClient();
   const presenters = usePresenters();
   const [busy, setBusy] = useState(false);
+  const [addingPresenter, setAddingPresenter] = useState(false);
   const mStart = toIstParts(meeting.starts_at);
   const mEnd = toIstParts(meeting.ends_at);
   const s = toIstParts(session?.starts_at);
@@ -114,11 +116,14 @@ function SessionModal({ meeting, session, onClose }: { meeting: Meeting; session
       })}>
         <Stack>
           <TextInput label={t('sessions.titleField')} required data-autofocus {...form.getInputProps('title')} />
-          <Select
-            label={t('sessions.presenter')} clearable searchable placeholder={t('sessions.noPresenter')}
-            data={(presenters.data ?? []).map((p: Presenter) => ({ value: p.id, label: `${p.full_name}${p.designation ? `, ${p.designation}` : ''}` }))}
-            {...form.getInputProps('presenter_id')}
-          />
+          <Group align="flex-end" gap="sm" wrap="nowrap">
+            <Select
+              label={t('sessions.presenter')} clearable searchable placeholder={t('sessions.noPresenter')} style={{ flex: 1 }}
+              data={(presenters.data ?? []).map((p: Presenter) => ({ value: p.id, label: `${p.full_name}${p.designation ? `, ${p.designation}` : ''}` }))}
+              {...form.getInputProps('presenter_id')}
+            />
+            <Button variant="default" onClick={() => setAddingPresenter(true)}>{t('sessions.newPresenter')}</Button>
+          </Group>
           <Group grow>
             <TextInput type="date" label={t('meetings.date')} {...form.getInputProps('date')} />
             <TextInput type="time" label={t('meetings.startTime')} {...form.getInputProps('start_time')} />
@@ -132,6 +137,10 @@ function SessionModal({ meeting, session, onClose }: { meeting: Meeting; session
           </Group>
         </Stack>
       </form>
+      {addingPresenter && (
+        <PresenterModal presenter={null} onClose={() => setAddingPresenter(false)}
+          onSaved={(id) => form.setFieldValue('presenter_id', id)} />
+      )}
     </Modal>
   );
 }
@@ -363,13 +372,17 @@ function AttachmentRow({ a, meetingId, canUpload }: { a: Attachment; meetingId: 
 }
 
 // ---------------------------------------------------------------------------
-export function SessionsPanel({ meeting, sessions, presentations, attachments, canEdit }: {
+export function SessionsPanel({ meeting, sessions, presentations, attachments, canEdit, show = 'all' }: {
   meeting: Meeting;
   sessions: MeetingSession[];
   presentations: PresentationWithVersions[];
   attachments: Attachment[];
   canEdit: boolean;
+  /** Which parts to show (the meeting wizard shows one part per step). */
+  show?: 'all' | 'sessions' | 'presentations' | 'attachments';
 }) {
+  const showPresentations = show === 'all' || show === 'presentations';
+  const showAttachments = show === 'all' || show === 'attachments';
   const { t } = useTranslation();
   const { me } = useAuth();
   const qc = useQueryClient();
@@ -386,7 +399,7 @@ export function SessionsPanel({ meeting, sessions, presentations, attachments, c
 
   return (
     <Stack gap="lg">
-      {rules.data && (
+      {rules.data && show !== 'sessions' && (
         <Text fz="sm" c="dimmed">
           {t('upload.allowedTypes', { types: rules.data.types.map((x) => x.toUpperCase()).join(', '), size: formatBytes(rules.data.maxFile) })}
         </Text>
@@ -420,15 +433,16 @@ export function SessionsPanel({ meeting, sessions, presentations, attachments, c
               )}
             </Group>
 
-            <Stack gap="sm">
+            {showPresentations && <Stack gap="sm">
               {sp.map((p) => (
                 <PresentationItem key={p.id} p={p} meetingId={meeting.id} canEditMeeting={canEdit && !archived} canUpload={upload} accept={accept} />
               ))}
               {upload && (
                 <Group><Button variant="light" leftSection={<IconPlus size={18} />} onClick={() => setAddingTo(s.id)}>{t('presentations.add')}</Button></Group>
               )}
-            </Stack>
+            </Stack>}
 
+            {showAttachments && <>
             <Divider my="md" label={t('attachments.title')} labelPosition="left" />
             {sa.length === 0 && <Text fz="sm" c="dimmed" mb="sm">{t('attachments.none')}</Text>}
             {sa.length > 0 && (
@@ -440,6 +454,7 @@ export function SessionsPanel({ meeting, sessions, presentations, attachments, c
               <UploadButton purpose="ATTACHMENT" targetId={s.id} accept={accept} multiple label={t('attachments.add')}
                 buttonProps={{ variant: 'default' }} testId={`attach-${i + 1}`} onUploaded={() => invalidateMeeting(qc, meeting.id)} />
             )}
+            </>}
           </Card>
         );
       })}

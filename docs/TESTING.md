@@ -18,9 +18,9 @@ cd tests && PRESENTIFY_ENV_FILE=../.env.test npm run test:load -- 300 60   # 300
 Browser tests need Chromium: `cd tests && npx playwright install chromium` once, or set
 `PW_CHROMIUM_PATH` to an installed Chromium.
 
-## What is tested (Phases 1–3)
+## What is tested (Phases 1–4)
 
-**API / security / database** (`tests/api`, 122 tests)
+**API / security / database** (`tests/api`, 131 tests)
 
 | File | Covers |
 |---|---|
@@ -30,9 +30,10 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
 | `04-signin-audit-storage` | lockout after 5 failures (even with the right password) and login events; MFA reset; audit actor/old-new values/IP; audit records immutable (update/delete/truncate); audit visibility per organisation; actor header cannot be spoofed; branding upload/read limited to own organisation; only images accepted; usage reporting |
 | `05-meetings-content` | presenter directory isolation; automatic meeting numbers; time validation; organiser/admin/presenter rights; no hand-over by organisers; cross-organisation invisibility; no publishing without sessions; archive is read-only and restorable; deleting only empty drafts; PDF and PowerPoint uploads, PDF copies, versions and restore; presenters cannot restore; supporting material; presenters upload only to their own sessions; disallowed types (exe, html, svg, js, no extension); disguised web page rejected and deleted; wrong content type; file-size limit (declared and actual); storage quota; removal frees space; upload acceptance not callable from browsers; no direct storage uploads; file access by organisation and by meeting; meeting/presentation limits; audit attribution |
 | `06-qr-participants` | QR created on publishing (one active); who may read, replace and switch it off; unknown, malformed and missing tokens; landing page without internal identifiers; availability (not yet open, custom window, days after the meeting, until archived, archived); setting validation; `has_passcode` only through the passcode function; required fields, consent, text-only values, anonymous entry only where allowed; access token (only its hash stored); same person not counted twice; trimming, control characters, length cap, unknown fields dropped; mobile/e-mail validation; directory linking across meetings; "remember me" in the same organisation only; passcode (bcrypt, case-sensitive, never shown to staff); optional / no registration; participant limit, including 20 simultaneous registrations against 10 places; registrations audited; content needs a valid access token for this meeting; visible items with view/download rights; short-lived signed links (tampered link refused); downloads only where allowed (with `Content-Disposition: attachment`); no preview for PowerPoint without a PDF copy; hidden items, wrong kind and other meetings' items refused; "release at session start"; events recorded with IP; replaced / expired / switched-off codes; view-only and deactivated organisations; who can see participant data (admins and organisers yes; presenters, other organisations, Super Admin, public no); no direct changes; participant functions not callable from browsers; retention (details removed after the period, counts kept, remembered devices removed; IP/browser blanked in events, attendance and audit log without opening the audit log to other changes; nightly schedule) |
+| `07-display-live` | QR code made for a draft (audited, "not open yet", no registration), kept on publishing; presenters, other organisations and the public cannot make one; archived meetings refused; a meeting moved back to draft hides its material; live figures (total, registered, active now, joined recently, views, downloads — no names); who may see them (administrators, organisers, the meeting's presenter; presenters lose them when the organisation switches the setting off; other presenters, other organisations, Super Admin, public refused); only administrators change the setting |
 | `99-rate-limit` | rapid sign-in attempts are refused with a JSON message and `Retry-After` (runs last) |
 
-**Browser** (`tests/e2e`, Playwright, 16 tests)
+**Browser** (`tests/e2e`, Playwright, 24 tests)
 
 - sign-in page: accessibility (axe, WCAG 2 A/AA, no serious/critical issues), English ⇄ Kannada
 - wrong password message
@@ -52,7 +53,18 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
   refused on a phone) → full-screen display with the current code → participant with wrong then right passcode →
   Participants tab shows the person and what they opened → dashboard count; presenters can display but not change
   the code or see participants; Kannada; accessibility
+- **wizard**: Create meeting → details → session with a new presenter added from inside the session form →
+  second session → presentation upload → supporting document → access settings → QR code created before
+  publishing ("not open yet" for phones) → review with warnings → publish → "Meeting Published Successfully"
+  with the same QR code, link and Display / Download / Print / Copy; continuing a draft later (publishing blocked
+  without sessions); the wizard on a phone; accessibility
+- **QR display at 1920 × 1080**: bilingual instruction, QR taller than 550 px, nothing below the screen (also at
+  1366 × 768 and 1280 × 720), live count off by default, on → updates by itself when a phone registers
+- **presenter mode at 1920 × 1080**: NOW with presenter and countdown, NEXT, meeting timer, QR; → / T / Q / C
+  keys; controls hide when idle; the meeting's presenter can use it and the count follows the organisation
+  setting; Kannada; accessibility
+- **live panel** on the meeting page updates by itself
 
 ## Results
 
-See [PHASE-3-REPORT.md](PHASE-3-REPORT.md) for the latest run.
+See [PHASE-4-REPORT.md](PHASE-4-REPORT.md) for the latest run.

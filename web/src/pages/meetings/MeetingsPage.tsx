@@ -9,7 +9,6 @@ import { PageHeader } from '../../components/PageHeader';
 import { formatDate, formatTime } from '../../lib/format';
 import { useMeetings, type MeetingFilter } from '../../lib/meetingsApi';
 import { meetingPhase, type MeetingPhase } from '../../lib/types';
-import { NewMeetingModal } from './MeetingForm';
 
 const phaseColor: Record<MeetingPhase, string> = {
   DRAFT: 'gray', SCHEDULED: 'blue', ACTIVE: 'green', COMPLETED: 'navy', ARCHIVED: 'gray',
@@ -26,7 +25,6 @@ export function MeetingsPage() {
   const [filter, setFilter] = useState<MeetingFilter>('upcoming');
   const [search, setSearch] = useState('');
   const [debounced] = useDebouncedValue(search, 300);
-  const [creating, setCreating] = useState(() => new URLSearchParams(window.location.search).has('new'));
   const { data = [], isLoading } = useMeetings(filter, debounced);
 
   return (
@@ -35,7 +33,7 @@ export function MeetingsPage() {
         title={t('meetings.title')}
         intro={t('meetings.intro')}
         actions={can('MEETING_MANAGE') && !readOnly && (
-          <Button leftSection={<IconPlus size={18} />} onClick={() => setCreating(true)}>{t('meetings.new')}</Button>
+          <Button component={Link} to="/meetings/new" leftSection={<IconPlus size={18} />}>{t('meetings.new')}</Button>
         )}
       />
       <Group mb="md" justify="space-between">
@@ -87,7 +85,6 @@ export function MeetingsPage() {
           </Table.Tbody>
         </Table>
       </ScrollArea>
-      {creating && <NewMeetingModal onClose={() => setCreating(false)} />}
     </>
   );
 }

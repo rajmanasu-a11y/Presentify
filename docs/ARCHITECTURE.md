@@ -1,6 +1,6 @@
 # Presentify — technical architecture (as implemented)
 
-Status: **Phases 1–3** (foundation; meetings and content; QR codes and participants). Later phases extend this document.
+Status: **Phases 1–4** (foundation; meetings and content; QR codes and participants; wizard, display and presenter modes, live count). Later phases extend this document.
 
 ## Services
 
@@ -141,6 +141,28 @@ organisation's retention period has passed after the meeting; a directory entry 
 attendance records keep details; IP addresses and browser details in access events, attendance and the audit log
 are blanked after `security.ip_retention_days` (default 90). Counts are kept. Each run that changes anything writes
 an audit record.
+
+## Phase 4 — wizard, display mode, presenter mode, live count
+
+```
+/meetings/new, /meetings/:id/setup?step=1…7   create-meeting wizard (reuses the meeting page's forms and panels;
+                                              each step saves at once; the meeting stays a draft until "Publish")
+/display/meetings/:id/qr                       QR display mode (1920 × 1080 and smaller; optional live count; print)
+/present/meetings/:id                          presenter mode: NOW / NEXT, countdown, meeting timer, QR, count
+```
+
+- **QR codes for drafts.** `regenerate_qr` now works for draft meetings (the wizard's QR step comes before
+  publishing, so codes can be printed in advance); archived meetings are refused. A draft's code answers
+  *"not open yet"* (no date) — also when a published meeting is moved back to draft.
+- **Live figures.** `meeting_live_stats(meeting)` returns counts only — total, registered, without details,
+  active in the last 10 minutes, joined in the last 10 minutes, views, downloads. Allowed for staff who can see
+  the meeting and have *View participants*, or *Display QR* when the organisation's setting
+  `presenters_see_count` is on (default). Screens poll it every 5 seconds (no extra server component).
+- **NOW / NEXT** are worked out in the browser from the session times (`web/src/lib/live.ts`); the presenter can
+  override them by hand when the meeting runs early or late (display only; participants' pages follow the
+  timetable and the release setting).
+- Display and presenter screens hide their controls after 3 seconds without mouse or keyboard use; they never
+  interact with PowerPoint, which runs separately.
 
 ## Security model
 

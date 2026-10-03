@@ -36,7 +36,7 @@ test('QR code tab, access settings, passcode, replacing the code', async ({ page
   await signInUi(page, organiser.email, PASSWORD);
   await expect(page.getByRole('heading', { name: /Welcome/ })).toBeVisible();
   await page.goto(`/meetings/${meeting.id}?tab=qr`);
-  await expect(page.getByText('The QR code is created when the meeting is published.')).toBeVisible();
+  await expect(page.getByText('You can create the QR code now and print it in advance.', { exact: false })).toBeVisible();
 
   // Publish → the QR code appears.
   await page.getByRole('button', { name: 'Publish' }).click();
@@ -69,7 +69,7 @@ test('QR code tab, access settings, passcode, replacing the code', async ({ page
   // Full-screen display page shows the current code and the bilingual instruction.
   const [display] = await Promise.all([page.waitForEvent('popup'), page.getByRole('link', { name: 'Show full screen' }).click()]);
   await expect(display.getByTestId('qr-display-image')).toBeVisible();
-  await expect(display.getByText('Scan with your phone camera to view the presentations')).toBeVisible();
+  await expect(display.getByText('Scan to access presentation and supporting material')).toBeVisible();
   await expect(display.getByText(`/m/${current}`)).toBeVisible();
   const img = await display.getByTestId('qr-display-image').boundingBox();
   expect(img.width).toBeGreaterThan(300);

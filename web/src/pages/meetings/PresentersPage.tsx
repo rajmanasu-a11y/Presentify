@@ -12,7 +12,7 @@ import { usePresenters, useStaff } from '../../lib/meetingsApi';
 import { supabase } from '../../lib/supabase';
 import type { Presenter } from '../../lib/types';
 
-function PresenterModal({ presenter, onClose }: { presenter: Presenter | null; onClose: () => void }) {
+export function PresenterModal({ presenter, onClose, onSaved }: { presenter: Presenter | null; onClose: () => void; onSaved?: (id: string) => void }) {
   const { t } = useTranslation();
   const { me } = useAuth();
   const qc = useQueryClient();
@@ -40,12 +40,13 @@ function PresenterModal({ presenter, onClose }: { presenter: Presenter | null; o
             full_name: v.full_name.trim(), designation: v.designation.trim() || null, office: v.office.trim() || null,
             email: v.email.trim() || null, phone: v.phone.trim() || null, user_id: v.user_id || null,
           };
-          const { error } = presenter
-            ? await supabase.from('presenters').update(row).eq('id', presenter.id)
-            : await supabase.from('presenters').insert(row);
+          const { data, error } = presenter
+            ? await supabase.from('presenters').update(row).eq('id', presenter.id).select('id').single()
+            : await supabase.from('presenters').insert(row).select('id').single();
           if (error) throw error;
           await qc.invalidateQueries({ queryKey: ['presenters'] });
           notifySuccess(t('presenters.saved'));
+          onSaved?.(data.id);
           onClose();
         } catch (err) { notifyError(err); } finally { setBusy(false); }
       })}>

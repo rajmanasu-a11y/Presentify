@@ -53,7 +53,7 @@ function Header({ info }: { info: MeetingInfo | null }) {
 function Message({ code, opensAt, onRetry }: { code: string; opensAt?: string | null; onRetry: () => void }) {
   const { t, lang } = useT();
   const [title, body] =
-    code === 'NOT_YET' ? [t('notYetTitle'), t('notYetBody', { time: opensAt ? formatTime(opensAt, lang) : '', date: opensAt ? formatDate(opensAt, lang) : '' })]
+    code === 'NOT_YET' ? [t('notYetTitle'), opensAt ? t('notYetBody', { time: formatTime(opensAt, lang), date: formatDate(opensAt, lang) }) : t('notYetNoDate')]
     : code === 'ENDED' ? [t('endedTitle'), t('endedBody')]
     : code === 'UNAVAILABLE' ? [t('unavailableTitle'), t('unavailableBody')]
     : code === 'NETWORK' || code === 'BUSY' ? ['', t('networkError')]

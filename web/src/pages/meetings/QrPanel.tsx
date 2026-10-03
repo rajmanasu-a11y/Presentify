@@ -63,6 +63,7 @@ function AccessState({ meeting, qr }: { meeting: Meeting; qr: QrCode | null }) {
   let color = 'green';
   let label = t('qr.stateOpen');
   if (!qr) { color = 'gray'; label = t('qr.stateOff'); }
+  else if (meeting.status === 'DRAFT') { color = 'yellow'; label = t('qr.stateDraft'); }
   else if (meeting.status === 'ARCHIVED') { color = 'gray'; label = t('qr.stateEnded'); }
   else if (opens && now < opens.getTime()) { color = 'yellow'; label = t('qr.stateNotYet'); }
   else if (closes && now > closes.getTime()) { color = 'gray'; label = t('qr.stateEnded'); }
@@ -96,7 +97,7 @@ function DateTimeIst({ label, value, onChange, disabled }: { label: string; valu
   );
 }
 
-function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }) {
+export function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const qr = useActiveQr(meeting.id);
@@ -113,8 +114,8 @@ function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }
     notifySuccess(message);
   };
 
-  if (meeting.status === 'DRAFT') return <Alert color="blue">{t('qr.publishFirst')}</Alert>;
   if (qr.isLoading) return <Text>{t('common.loading')}</Text>;
+  const draft = meeting.status === 'DRAFT';
 
   const fileName = `${meeting.reference_no}-QR.png`;
   return (
@@ -125,12 +126,13 @@ function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }
             <img src={image} alt={t('qr.imageAlt', { title: meeting.title })} data-testid="qr-image"
               style={{ width: '100%', maxWidth: 320, aspectRatio: '1', display: 'block', border: '1px solid var(--mantine-color-gray-3)', borderRadius: 8 }} />
           ) : (
-            <Alert color="gray">{t('qr.noActive')}</Alert>
+            <Alert color={draft ? 'blue' : 'gray'}>{draft ? t('qr.draftNoQr') : t('qr.noActive')}</Alert>
           )}
         </Grid.Col>
         <Grid.Col span={{ base: 12, sm: 7 }}>
           <Stack gap="md">
             <AccessState meeting={meeting} qr={qr.data ?? null} />
+            {draft && qr.data && <Alert color="yellow">{t('qr.draftHasQr')}</Alert>}
             {link && (
               <>
                 <TextInput label={t('qr.link')} value={link} readOnly onFocus={(e) => e.currentTarget.select()} data-testid="qr-link" />
@@ -147,7 +149,7 @@ function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }
                 <Anchor href={link} target="_blank" rel="noopener" fz="sm">{t('qr.openAsParticipant')}</Anchor>
               </>
             )}
-            {canManage && meeting.status === 'PUBLISHED' && (
+            {canManage && meeting.status !== 'ARCHIVED' && (
               <Stack gap="sm" mt="sm">
                 <Title order={4}>{t('qr.manage')}</Title>
                 {qr.data && (
@@ -160,10 +162,14 @@ function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }
                   </Group>
                 )}
                 <Group gap="sm">
-                  <ConfirmButton variant="default" message={t('qr.confirmRegenerate')}
-                    onConfirm={() => rpc('regenerate_qr', { p_meeting: meeting.id, p_expires_at: null }, t('qr.regenerated'))}>
-                    {qr.data ? t('qr.regenerate') : t('qr.create')}
-                  </ConfirmButton>
+                  {qr.data ? (
+                    <ConfirmButton variant="default" message={t('qr.confirmRegenerate')}
+                      onConfirm={() => rpc('regenerate_qr', { p_meeting: meeting.id, p_expires_at: null }, t('qr.regenerated'))}>
+                      {t('qr.regenerate')}
+                    </ConfirmButton>
+                  ) : (
+                    <Button onClick={() => void rpc('regenerate_qr', { p_meeting: meeting.id, p_expires_at: null }, t('qr.generated'))}>{t('qr.create')}</Button>
+                  )}
                   {qr.data && (
                     <ConfirmButton variant="default" color="red" message={t('qr.confirmRevoke')}
                       onConfirm={() => rpc('revoke_qr', { p_meeting: meeting.id }, t('qr.revoked'))}>
@@ -183,7 +189,7 @@ function QrCard({ meeting, canManage }: { meeting: Meeting; canManage: boolean }
 
 const AFTER_DAYS = [0, 1, 3, 7, 15, 30, 90, 180, 365];
 
-function AccessSettings({ meeting, disabled }: { meeting: Meeting; disabled: boolean }) {
+export function AccessSettings({ meeting, disabled }: { meeting: Meeting; disabled: boolean }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [busy, setBusy] = useState(false);

@@ -57,6 +57,7 @@ export interface OrganisationSettings {
   consent_text_kn: string | null;
   participant_retention_days: number | null;
   keep_participant_directory: boolean;
+  presenters_see_count: boolean;
   require_mfa_for_admins: boolean;
   default_language: 'en' | 'kn';
   brand_color: string;

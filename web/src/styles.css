@@ -38,42 +38,95 @@ body { background: var(--mantine-color-gray-0); }
   --mantine-color-blue-light-color: #1c4f8f;
 }
 
-/* ---- Full-screen QR display (projector / TV) and its print layout ---------- */
+/* ---- Full-screen QR display (projector / TV, designed for 1920×1080) and print ---- */
 .qr-display {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   box-sizing: border-box;
-  padding: clamp(16px, 3vh, 40px) 24px;
+  padding: 2.2vh 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: clamp(8px, 2vh, 24px);
+  justify-content: space-between;
+  gap: 1.2vh;
   background: #0b2e5c;
   color: #fff;
   text-align: center;
 }
-.qr-display header h1 { margin: 0.2em 0; font-size: clamp(22px, 4.2vh, 52px); line-height: 1.2; }
-.qr-display header p { margin: 0; font-size: clamp(16px, 2.4vh, 28px); opacity: 0.92; }
-.qr-display-org { font-size: clamp(16px, 2.4vh, 28px); font-weight: 600; opacity: 0.92; }
+.qr-display header { display: flex; flex-direction: column; align-items: center; gap: 0.4vh; }
+.qr-display-logo { height: 7vh; max-width: 30vw; object-fit: contain; background: #fff; border-radius: 8px; padding: 0.5vh; }
+.qr-display header h1 { margin: 0; font-size: clamp(22px, 4.4vh, 60px); line-height: 1.15; max-width: 90vw; }
+.qr-display header p { margin: 0; font-size: clamp(14px, 2.2vh, 30px); opacity: 0.92; }
+.qr-display-org { font-size: clamp(14px, 2.2vh, 30px); font-weight: 600; opacity: 0.92; }
+.qr-display-body { display: flex; align-items: center; justify-content: center; gap: 4vw; min-height: 0; flex: 1 1 auto; }
 .qr-display-code {
-  width: min(62vh, 86vw);
-  height: min(62vh, 86vw);
+  height: min(56vh, 86vw);
+  width: min(56vh, 86vw);
   background: #fff;
   border-radius: 12px;
   padding: 1.2vh;
   box-sizing: border-box;
   image-rendering: pixelated;
 }
+.qr-display-count { display: flex; flex-direction: column; align-items: center; gap: 0.4vh; font-size: clamp(14px, 2.2vh, 28px); }
+.qr-display-count strong { font-size: clamp(36px, 10vh, 140px); line-height: 1; }
 .qr-display-off { font-size: 24px; background: #fff; color: #8a1c1c; padding: 24px; border-radius: 12px; }
-.qr-display-scan { display: flex; flex-direction: column; gap: 4px; font-size: clamp(18px, 3vh, 36px); }
-.qr-display-link { font-size: clamp(14px, 1.9vh, 22px); word-break: break-all; opacity: 0.95; }
-.qr-display footer { font-size: 14px; opacity: 0.8; }
-.qr-display-toolbar { position: fixed; top: 12px; right: 12px; opacity: 0.25; transition: opacity 0.2s; }
-.qr-display-toolbar:hover, .qr-display-toolbar:focus-within { opacity: 1; }
+.qr-display-scan { display: flex; flex-direction: column; gap: 0.3vh; font-size: clamp(16px, 3.2vh, 44px); line-height: 1.25; }
+.qr-display-scan span { font-size: 0.66em; opacity: 0.92; }
+.qr-display-link { font-size: clamp(12px, 1.7vh, 22px); word-break: break-all; opacity: 0.95; }
+.qr-display footer { font-size: clamp(11px, 1.3vh, 16px); opacity: 0.8; }
+/* Controls show at full contrast while the mouse/keyboard is used and hide when idle. */
+.qr-display-toolbar, .pm-toolbar { position: fixed; top: 12px; right: 12px; z-index: 5; padding: 6px; border-radius: 10px; background: rgba(0, 0, 0, 0.35); }
+.pm-toolbar { top: auto; bottom: 8vh; }
+.qr-display-toolbar.idle:not(:focus-within):not(:hover), .pm-toolbar.idle:not(:focus-within):not(:hover) { visibility: hidden; }
 :fullscreen .qr-display-toolbar { display: none; }
 @media print {
-  .qr-display { background: #fff; color: #000; min-height: auto; padding: 0; }
+  .qr-display { background: #fff; color: #000; height: auto; overflow: visible; padding: 0; }
   .qr-display-toolbar { display: none; }
   .qr-display-code { width: 14cm; height: 14cm; border: 0; }
+}
+
+/* ---- Presenter mode (Start presentation) ------------------------------------- */
+.pm {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  background: #0d1b2a;
+  color: #f1f5f9;
+}
+.pm-top { display: flex; align-items: center; gap: 2vw; padding: 1.8vh 3vw; background: #0b2e5c; font-size: clamp(14px, 2.2vh, 30px); }
+.pm-org { font-weight: 600; opacity: 0.9; white-space: nowrap; }
+.pm-title { flex: 1; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-clock { font-variant-numeric: tabular-nums; font-weight: 700; white-space: nowrap; }
+.pm-main { flex: 1; display: grid; grid-template-columns: 1fr; gap: 3vw; padding: 3vh 3vw; min-height: 0; }
+.pm-main.pm-with-side, .pm-main:has(.pm-side) { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+.pm-now { display: flex; flex-direction: column; justify-content: center; gap: 1.4vh; min-width: 0; }
+.pm-label { text-transform: uppercase; letter-spacing: 0.12em; font-weight: 700; font-size: clamp(13px, 2.2vh, 28px); color: #93c5fd; }
+.pm-manual { text-transform: none; letter-spacing: 0; color: #fcd34d; }
+.pm-session { margin: 0; font-size: clamp(28px, 7vh, 96px); line-height: 1.1; overflow-wrap: anywhere; }
+.pm-presenter { font-size: clamp(18px, 3.6vh, 48px); font-weight: 600; }
+.pm-slot { font-size: clamp(16px, 2.8vh, 36px); opacity: 0.85; font-variant-numeric: tabular-nums; }
+.pm-timer { font-size: clamp(28px, 7.5vh, 104px); font-weight: 700; font-variant-numeric: tabular-nums; color: #bbf7d0; }
+.pm-timer.soon { color: #fcd34d; }
+.pm-timer.over { color: #fca5a5; }
+.pm-progress { height: 1.2vh; min-height: 6px; background: rgba(255, 255, 255, 0.15); border-radius: 99px; overflow: hidden; }
+.pm-progress div { height: 100%; background: #60a5fa; }
+.pm-next { margin-top: 2vh; padding: 2vh 2vw; border-radius: 12px; background: rgba(255, 255, 255, 0.07); }
+.pm-next-title { font-size: clamp(18px, 4vh, 54px); font-weight: 700; line-height: 1.2; }
+.pm-next-meta { font-size: clamp(14px, 2.4vh, 32px); opacity: 0.85; }
+.pm-side { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh; text-align: center; min-width: 0; }
+.pm-qr { width: min(100%, 42vh); aspect-ratio: 1; background: #fff; border-radius: 10px; padding: 1vh; box-sizing: border-box; image-rendering: pixelated; }
+.pm-scan { font-size: clamp(14px, 2.4vh, 32px); font-weight: 600; }
+.pm-count { display: flex; gap: 3vw; }
+.pm-count div { display: flex; flex-direction: column; align-items: center; }
+.pm-count strong { font-size: clamp(28px, 7vh, 96px); line-height: 1; }
+.pm-count span { font-size: clamp(12px, 1.9vh, 24px); opacity: 0.85; }
+.pm-bottom { display: flex; justify-content: space-between; gap: 2vw; padding: 1.4vh 3vw; font-size: clamp(13px, 2vh, 26px); background: rgba(255, 255, 255, 0.06); font-variant-numeric: tabular-nums; }
+@media (max-width: 700px) {
+  .pm-main.pm-with-side, .pm-main:has(.pm-side) { grid-template-columns: 1fr; }
+  .pm-top { flex-wrap: wrap; }
 }
