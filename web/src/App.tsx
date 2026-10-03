@@ -1,5 +1,6 @@
 import { Center, Loader } from '@mantine/core';
 import { lazy, Suspense, type ReactNode } from 'react';
+import { IdleSignOut } from './components/IdleSignOut';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router';
 import { useAuth } from './auth/AuthProvider';
 import { AppLayout } from './components/AppLayout';
@@ -47,7 +48,7 @@ function SignedInGate() {
     case 'needsMfa': return <MfaChallengePage />;
     case 'needsPasswordChange': return <ForcedPasswordChangePage />;
     case 'needsMfaSetup': return <MfaSetupPage />;
-    default: return <Suspense fallback={<Loading />}><Outlet /></Suspense>;
+    default: return <><IdleSignOut /><Suspense fallback={<Loading />}><Outlet /></Suspense></>;
   }
 }
 

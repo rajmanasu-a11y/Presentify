@@ -9,6 +9,7 @@ import { Logo } from '../../components/Logo';
 import { TestModeBanner } from '../../components/TestModeBanner';
 import { supabase } from '../../lib/supabase';
 import i18n from '../../i18n';
+import { IDLE_FLAG } from '../../components/IdleSignOut';
 
 /** Turns Supabase Auth errors into translated, actionable messages. */
 export function authMessage(err: { message?: string; code?: string; status?: number } | null): string {
@@ -53,6 +54,10 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [showForgot, setShowForgot] = useState(false);
+  // Shown once after an automatic sign-out for inactivity.
+  const [idle] = useState(() => {
+    try { const v = sessionStorage.getItem(IDLE_FLAG); sessionStorage.removeItem(IDLE_FLAG); return v === '1'; } catch { return false; }
+  });
   const form = useForm({
     initialValues: { email: '', password: '' },
     validate: {
@@ -77,6 +82,7 @@ export function LoginPage() {
         })}
       >
         <Stack>
+          {idle && !error && <Alert color="blue" role="status">{t('idle.signedOut')}</Alert>}
           {error && <Alert color="red" icon={<IconAlertCircle />} role="alert">{error}</Alert>}
           <TextInput label={t('auth.email')} type="email" autoComplete="username" autoFocus required {...form.getInputProps('email')} />
           <PasswordInput label={t('auth.password')} autoComplete="current-password" required {...form.getInputProps('password')} />

@@ -5,7 +5,8 @@
   "scripts": {
     "test:api": "node --test --test-concurrency=1 \"api/*.test.mjs\"",
     "test:e2e": "playwright test -c playwright.config.mjs",
-    "test:load": "node load/qr-rush.mjs"
+    "test:load": "node load/qr-rush.mjs",
+    "test:install": "playwright test -c playwright.install.config.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

@@ -33,7 +33,7 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
 | `07-display-live` | QR code made for a draft (audited, "not open yet", no registration), kept on publishing; presenters, other organisations and the public cannot make one; archived meetings refused; a meeting moved back to draft hides its material; live figures (total, registered, active now, joined recently, views, downloads — no names); who may see them (administrators, organisers, the meeting's presenter; presenters lose them when the organisation switches the setting off; other presenters, other organisations, Super Admin, public refused); only administrators change the setting |
 | `99-rate-limit` | rapid sign-in attempts are refused with a JSON message and `Retry-After` (runs last) |
 
-**Browser** (`tests/e2e`, Playwright, 24 tests)
+**Browser** (`tests/e2e`, Playwright, 30 tests)
 
 - sign-in page: accessibility (axe, WCAG 2 A/AA, no serious/critical issues), English ⇄ Kannada
 - wrong password message
@@ -64,7 +64,16 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
   keys; controls hide when idle; the meeting's presenter can use it and the count follows the organisation
   setting; Kannada; accessibility
 - **live panel** on the meeting page updates by itself
+- **hostile input** (`security.spec`): script-like text in every displayed field is shown as plain text on all
+  staff screens, presenter mode, QR display and the phone page; an injected script is blocked by the CSP
+- **sign-out after inactivity** (`session.spec`): warning, sign-out with explanation; activity and *Stay signed
+  in* keep the session; QR display and presenter screens stay on
+
+**Installation check** (`tests/acceptance`, run against a real installation — see
+[TESTING-GUIDE.md](TESTING-GUIDE.md)): Super Admin first sign-in with authenticator → organisation →
+administrator → wizard → publish → phone registers and reads the PDF → attendance, presenter mode, QR display.
 
 ## Results
 
-See [PHASE-4-REPORT.md](PHASE-4-REPORT.md) for the latest run.
+See [TEST-REPORT-2026-10-03.md](TEST-REPORT-2026-10-03.md) for the latest full run, and
+[TESTING-GUIDE.md](TESTING-GUIDE.md) for prerequisites and the manual acceptance checklist.

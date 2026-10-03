@@ -234,6 +234,8 @@ services:
       PUBLIC_URL: ${PUBLIC_URL}
       TEST_MODE: ${TEST_MODE:-true}
       EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
+      # Screens sign out after this long without mouse/keyboard use (same as the server's limit).
+      SESSION_INACTIVITY_TIMEOUT: ${SESSION_INACTIVITY_TIMEOUT:-30m}
       # Sign-in attempts allowed per minute from one device/IP address.
       SIGNIN_RATE_PER_MINUTE: ${SIGNIN_RATE_PER_MINUTE:-30}
       # Participant requests allowed per second from one address (a whole venue may share one).

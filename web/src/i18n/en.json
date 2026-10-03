@@ -720,5 +720,11 @@
     "scanHint": "Open your mobile camera and scan the QR code",
     "count": "Participant count",
     "joined": "participants have joined"
+  },
+  "idle": {
+    "title": "Are you still there?",
+    "body": "For security you will be signed out in {{seconds}} seconds because there has been no activity.",
+    "stay": "Stay signed in",
+    "signedOut": "You were signed out because there was no activity for a while. Please sign in again."
   }
 }

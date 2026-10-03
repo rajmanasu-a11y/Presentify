@@ -41,7 +41,9 @@ React + TypeScript + Mantine · nginx gateway · Docker Compose. Details:
 | [docs/00-DISCOVERY.md](docs/00-DISCOVERY.md) | Original analysis, questions, ER diagram |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Services, data model, security model |
 | [docs/INSTALL-LAPTOP-WINDOWS.md](docs/INSTALL-LAPTOP-WINDOWS.md) | Laptop installation (Windows 11) |
-| [docs/TESTING.md](docs/TESTING.md) | How to run the tests and what they cover |
+| [docs/TESTING-GUIDE.md](docs/TESTING-GUIDE.md) | **Testing guide**: prerequisites, automated tests, installation check, manual checklist |
+| [docs/TESTING.md](docs/TESTING.md) | What the automated tests cover |
+| [docs/TEST-REPORT-2026-10-03.md](docs/TEST-REPORT-2026-10-03.md) | Latest thorough test run and findings |
 | [docs/PHASE-1-REPORT.md](docs/PHASE-1-REPORT.md) | Phase 1 delivery, test results, checklist |
 | [docs/PHASE-2-REPORT.md](docs/PHASE-2-REPORT.md) | Phase 2 delivery, test results, checklist |
 | [docs/PHASE-3-REPORT.md](docs/PHASE-3-REPORT.md) | Phase 3 delivery, test results, load check, checklist |
@@ -50,5 +52,5 @@ React + TypeScript + Mantine · nginx gateway · Docker Compose. Details:
 ## Tests
 
 ```bash
-scripts/test.sh        # disposable test stack on port 8090: 131 API/security + 24 browser tests
+scripts/test.sh        # disposable test stack on port 8090: 131 API/security + 30 browser tests
 ```

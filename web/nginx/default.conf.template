@@ -64,7 +64,7 @@ server {
     default_type application/javascript;
     add_header Cache-Control "no-store" always;
     include /etc/nginx/snippets/security-headers.conf;
-    return 200 'window.__PRESENTIFY__={anonKey:"${ANON_KEY}",publicUrl:"${PUBLIC_URL}",testMode:${TEST_MODE},emailEnabled:${EMAIL_ENABLED}};';
+    return 200 'window.__PRESENTIFY__={anonKey:"${ANON_KEY}",publicUrl:"${PUBLIC_URL}",testMode:${TEST_MODE},emailEnabled:${EMAIL_ENABLED},sessionInactivity:"${SESSION_INACTIVITY_TIMEOUT}"};';
   }
 
   # ---- Auth ------------------------------------------------------------------
