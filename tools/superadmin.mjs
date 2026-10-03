@@ -90,3 +90,15 @@ export async function createSuperAdmin(args) {
   if (!opts.password) console.log(`  Temporary password: ${password}`);
   console.log('\nAt first sign-in the password must be changed and an authenticator app (MFA) set up.');
 }
+
+/** Prints how many active Super Admins exist (used by the installer). */
+export async function countSuperAdmins() {
+  const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
+  await client.connect();
+  try {
+    const { rows } = await client.query(`select count(*)::int as n from public.profiles where role = 'SUPER_ADMIN' and is_active`);
+    console.log(rows[0].n);
+  } finally {
+    await client.end();
+  }
+}
