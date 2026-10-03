@@ -86,5 +86,5 @@ React + TypeScript + Mantine · nginx gateway · Docker Compose. Details:
 ## Tests
 
 ```bash
-scripts/test.sh        # disposable test stack on port 8090: 131 API/security + 30 browser tests
+scripts/test.sh        # disposable test stack on port 8090: 134 API/security + 30 browser tests
 ```

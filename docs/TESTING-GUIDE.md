@@ -71,8 +71,8 @@ KEEP_STACK=1 scripts/test.sh # keep the temporary copy running afterwards (neede
 **Reading the result.** At the end you should see two summaries:
 
 ```
-# tests 131
-# pass 131
+# tests 134
+# pass 134
 # fail 0          ← server / security / database tests
 ...
   30 passed       ← browser tests (screens, phone, Kannada, accessibility, security, sign-out)

@@ -20,10 +20,11 @@ Browser tests need Chromium: `cd tests && npx playwright install chromium` once,
 
 ## What is tested (Phases 1–4)
 
-**API / security / database** (`tests/api`, 131 tests)
+**API / security / database** (`tests/api`, 134 tests)
 
 | File | Covers |
 |---|---|
+| `00-repository` | Windows scripts are plain ASCII (Windows PowerShell 5.1 misreads other characters); line endings LF for Linux files and CRLF for Windows scripts; no `.env` or certificates committed |
 | `01-gateway` | security headers, SPA routing, no secrets in runtime config, Auth admin blocked, sign-up disabled, forged/missing tokens rejected, anonymous access to every table and RPC refused |
 | `02-tenancy` | organisation admins see/change only their organisation (organisations, settings, profiles, limits, usage, staff); cannot create organisations or change package/limits/status/expiry; organisers' restrictions; no direct writes to profiles/audit/system settings; Super Admin sees all; Super Admin without MFA sees nothing |
 | `03-users-and-limits` | temporary password and forced change; password policy; duplicate e-mail; input validation; administrator and user limits enforced by the server (no orphan logins); Super Admin raises limits; no self-deactivation/self-demotion; deactivation blocks sign-in and existing tokens; temporary password reset; role changes; own-profile updates; deactivated organisation; grace period; view-only after grace; retention vs package |

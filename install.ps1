@@ -4,7 +4,7 @@
 #   powershell -ExecutionPolicy Bypass -File install.ps1
 #   powershell -ExecutionPolicy Bypass -File install.ps1 -PublicUrl http://192.168.1.20:8080
 #
-# What it does (safe to run again at any time — it never deletes data):
+# What it does (safe to run again at any time - it never deletes data):
 #   1. checks that Docker Desktop is running
 #   2. first time only: creates the private configuration file .env with new random keys
 #   3. checks that the address in .env still matches this computer's network address
