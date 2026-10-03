@@ -8,7 +8,7 @@ import { useAuth } from '../../auth/AuthProvider';
 import { AccessBadge } from '../../components/Badges';
 import { PageHeader } from '../../components/PageHeader';
 import { StatCard } from '../../components/StatCard';
-import { formatBytes, formatDate, formatTime } from '../../lib/format';
+import { formatBytes, formatDate, formatTime, todayIst } from '../../lib/format';
 import { useMeetings, type MeetingRow } from '../../lib/meetingsApi';
 import { supabase } from '../../lib/supabase';
 import { meetingPhase, type Usage } from '../../lib/types';
@@ -72,6 +72,37 @@ function MeetingList({ title, empty, rows }: { title: string; empty: string; row
   );
 }
 
+/** Active QR codes and registrations (staff who may see participant data). */
+function ParticipationCards() {
+  const { t } = useTranslation();
+  const q = useQuery({
+    queryKey: ['participation-summary'],
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const day = new Date(`${todayIst()}T00:00:00+05:30`).toISOString();
+      const month = new Date(Date.now() - 30 * 86400e3).toISOString();
+      const [qr, today, last30] = await Promise.all([
+        supabase.from('qr_codes').select('id', { count: 'exact', head: true }).eq('status', 'ACTIVE'),
+        supabase.from('attendance').select('id', { count: 'exact', head: true }).gte('registered_at', day),
+        supabase.from('attendance').select('id', { count: 'exact', head: true }).gte('registered_at', month),
+      ]);
+      for (const r of [qr, today, last30]) if (r.error) throw r.error;
+      return { qr: qr.count ?? 0, today: today.count ?? 0, last30: last30.count ?? 0 };
+    },
+  });
+  if (!q.data) return null;
+  return (
+    <div>
+      <Title order={2} fz="lg" mb="sm">{t('dashboard.participation')}</Title>
+      <SimpleGrid cols={{ base: 1, xs: 3 }}>
+        <StatCard label={t('dashboard.activeQr')} value={q.data.qr} />
+        <StatCard label={t('dashboard.registeredToday')} value={q.data.today} />
+        <StatCard label={t('dashboard.registered30')} value={q.data.last30} />
+      </SimpleGrid>
+    </div>
+  );
+}
+
 export function OrgDashboardPage() {
   const { t } = useTranslation();
   const { me, can, readOnly } = useAuth();
@@ -125,6 +156,7 @@ export function OrgDashboardPage() {
               rows={(upcoming.data ?? []).filter((m) => !todayIds.has(m.id)).slice(0, 5)} />
           </SimpleGrid>
         )}
+        {can('PARTICIPANT_VIEW') && <ParticipationCards />}
         {can('MEETING_VIEW') && (recent.data ?? []).length > 0 && (
           <Card withBorder padding="lg">
             <Title order={2} fz="lg" mb="sm">{t('dashboard.recentPresentations')}</Title>

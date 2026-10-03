@@ -10,6 +10,10 @@ export default defineConfig({
     target: 'es2020',
     sourcemap: false,
     chunkSizeWarningLimit: 900,
+    rolldownOptions: {
+      // Staff application, and the small participant page (scan → register → view).
+      input: { main: 'index.html', participant: 'm.html' },
+    },
   },
   server: {
     proxy: Object.fromEntries(

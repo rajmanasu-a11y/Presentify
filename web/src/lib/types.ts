@@ -51,6 +51,7 @@ export interface OrganisationSettings {
   organisation_id: string;
   allowed_file_types: string[];
   downloads_default: boolean;
+  viewer_watermark: boolean;
   registration_fields: RegistrationField[];
   consent_text_en: string | null;
   consent_text_kn: string | null;
@@ -156,6 +157,13 @@ export interface Meeting {
   status: MeetingStatus;
   downloads_allowed: boolean;
   session_release: 'ALL' | 'ON_START';
+  registration_mode: 'REQUIRED' | 'OPTIONAL' | 'NONE';
+  availability_mode: 'MEETING' | 'CUSTOM' | 'ALWAYS';
+  open_before_minutes: number;
+  access_after_days: number | null;
+  custom_from: string | null;
+  custom_until: string | null;
+  has_passcode: boolean;
   published_at: string | null;
   archived_at: string | null;
   created_at: string;
@@ -221,4 +229,25 @@ export function meetingPhase(m: Pick<Meeting, 'status' | 'starts_at' | 'ends_at'
   if (now < new Date(m.starts_at).getTime()) return 'SCHEDULED';
   if (now <= new Date(m.ends_at).getTime()) return 'ACTIVE';
   return 'COMPLETED';
+}
+
+export interface QrCode {
+  id: string;
+  meeting_id: string;
+  token: string;
+  status: 'ACTIVE' | 'REVOKED';
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface AttendanceRow {
+  id: string;
+  meeting_id: string;
+  participant_id: string | null;
+  anonymous: boolean;
+  details: Record<string, string>;
+  registered_at: string;
+  first_access_at: string | null;
+  last_access_at: string | null;
+  anonymised_at: string | null;
 }

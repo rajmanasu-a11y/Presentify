@@ -115,6 +115,7 @@ export const invalidateMeeting = async (qc: { invalidateQueries: (o: { queryKey:
   await Promise.all([
     qc.invalidateQueries({ queryKey: ['meeting', id] }),
     qc.invalidateQueries({ queryKey: ['meeting-content', id] }),
+    qc.invalidateQueries({ queryKey: ['qr', id] }),          // publishing creates the QR code
     qc.invalidateQueries({ queryKey: ['meetings'] }),
     qc.invalidateQueries({ queryKey: ['presentations-library'] }),
     qc.invalidateQueries({ queryKey: ['usage'] }),

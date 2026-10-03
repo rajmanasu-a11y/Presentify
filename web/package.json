@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/copy-pdfjs.mjs",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview"
   },
@@ -20,12 +20,15 @@
     "@tabler/icons-react": "^3.48.0",
     "@tanstack/react-query": "^5.104.0",
     "i18next": "^26.4.2",
+    "pdfjs-dist": "^6.3.289",
+    "qrcode": "^1.5.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "react-i18next": "^17.0.15",
     "react-router": "^8.4.0"
   },
   "devDependencies": {
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",

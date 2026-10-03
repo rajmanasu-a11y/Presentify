@@ -14,6 +14,8 @@ import { meetingPhase, type Meeting } from '../../lib/types';
 import { NotFoundPage } from '../AccountPages';
 import { MeetingDetailsForm } from './MeetingForm';
 import { PhaseBadge } from './MeetingsPage';
+import { ParticipantsPanel } from './ParticipantsPanel';
+import { QrPanel } from './QrPanel';
 import { SessionsPanel } from './SessionsPanel';
 
 function SharingSettings({ meeting, disabled }: { meeting: Meeting; disabled: boolean }) {
@@ -104,6 +106,8 @@ export function MeetingDetailPage() {
       <Tabs defaultValue={initialTab} keepMounted={false}>
         <Tabs.List mb="lg">
           <Tabs.Tab value="sessions">{t('meetings.sessionsTab')}</Tabs.Tab>
+          {can('QR_DISPLAY') && <Tabs.Tab value="qr">{t('qr.tab')}</Tabs.Tab>}
+          {can('PARTICIPANT_VIEW') && <Tabs.Tab value="participants">{t('attendance.tab')}</Tabs.Tab>}
           <Tabs.Tab value="details">{t('meetings.detailsTab')}</Tabs.Tab>
           <Tabs.Tab value="settings">{t('meetings.settingsTab')}</Tabs.Tab>
         </Tabs.List>
@@ -115,6 +119,14 @@ export function MeetingDetailPage() {
               attachments={content.data.attachments} canEdit={canManage} />
           )}
         </Tabs.Panel>
+        {can('QR_DISPLAY') && (
+          <Tabs.Panel value="qr">
+            <QrPanel meeting={m} canManage={canManage && can('QR_MANAGE')} canEditContent={canManage} />
+          </Tabs.Panel>
+        )}
+        {can('PARTICIPANT_VIEW') && (
+          <Tabs.Panel value="participants"><ParticipantsPanel meetingId={m.id} /></Tabs.Panel>
+        )}
         <Tabs.Panel value="details">
           <Card withBorder padding="lg"><MeetingDetailsForm meeting={m} disabled={!canManage || archived} /></Card>
         </Tabs.Panel>

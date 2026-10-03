@@ -22,6 +22,7 @@ const AuditPage = lazyPage(OrgPages, 'AuditPage');
 const MeetingsPage = lazyPage(MeetingsPages, 'MeetingsPage');
 const MeetingDetailPage = lazyPage(MeetingDetail, 'MeetingDetailPage');
 const PresentersPage = lazyPage(PresentersPages, 'PresentersPage');
+const QrDisplayPage = lazyPage(() => import('./pages/meetings/QrDisplayPage'), 'QrDisplayPage');
 const PresentationsPage = lazyPage(PresentationsPages, 'PresentationsPage');
 const ConsoleDashboardPage = lazyPage(ConsolePages, 'ConsoleDashboardPage');
 const OrganisationsPage = lazyPage(ConsolePages, 'OrganisationsPage');
@@ -65,6 +66,8 @@ export const router = createBrowserRouter([
   {
     element: <SignedInGate />,
     children: [
+      // Full-screen pages without the menu (projector / print).
+      { path: 'display/meetings/:id/qr', element: <Require when={perm('QR_DISPLAY')}><QrDisplayPage /></Require> },
       {
         element: <AppLayout />,
         children: [

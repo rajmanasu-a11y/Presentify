@@ -207,6 +207,7 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
       default_language: settings.default_language,
       allowed_file_types: settings.allowed_file_types,
       downloads_default: settings.downloads_default,
+      viewer_watermark: settings.viewer_watermark,
       require_mfa_for_admins: settings.require_mfa_for_admins,
     },
   });
@@ -244,6 +245,7 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
             } : section === 'files' ? {
               allowed_file_types: v.allowed_file_types,
               downloads_default: v.downloads_default,
+              viewer_watermark: v.viewer_watermark,
             } : { require_mfa_for_admins: v.require_mfa_for_admins };
           const { error } = await supabase.from('organisation_settings').update(patch).eq('organisation_id', settings.organisation_id);
           if (error) throw error;
@@ -314,6 +316,10 @@ export function OrganisationSettingsForm({ settings, section, maxRetentionDays, 
             </Checkbox.Group>
             <Switch label={t('org.downloadsDefault')} {...form.getInputProps('downloads_default', { type: 'checkbox' })} />
             <Alert color="blue">{t('org.downloadsHelp')}</Alert>
+            <div>
+              <Switch label={t('org.watermark')} {...form.getInputProps('viewer_watermark', { type: 'checkbox' })} />
+              <Text fz="sm" c="dimmed" mt={4}>{t('org.watermarkHelp')}</Text>
+            </div>
           </Stack>
         )}
         {section === 'security' && (

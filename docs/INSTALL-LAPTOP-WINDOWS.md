@@ -84,6 +84,9 @@ Enter your e-mail address and name. A **temporary password** is shown — note i
 - If Windows asks whether to allow Docker on the network, choose **Private networks → Allow**.
 - If the laptop's Wi-Fi address changes (different network), edit `PUBLIC_URL` in `.env`
   and run `docker compose up -d` again.
+- **QR codes contain this address.** If it changes, QR codes printed or downloaded earlier point to the old
+  address: show or print them again from the meeting's *QR code & access* tab (the meeting keeps the same code).
+  Check before a meeting by scanning the displayed QR code with your own phone.
 
 ## Everyday commands
 

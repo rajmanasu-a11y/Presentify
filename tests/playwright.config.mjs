@@ -20,7 +20,7 @@ export default defineConfig({
     launchOptions: { executablePath },
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 820 }, launchOptions: { executablePath } } },
-    { name: 'mobile', testMatch: /responsive/, use: { ...devices['Pixel 7'], launchOptions: { executablePath } } },
+    { name: 'desktop', testIgnore: /participant/, use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 820 }, launchOptions: { executablePath } } },
+    { name: 'mobile', testMatch: /responsive|participant/, use: { ...devices['Pixel 7'], launchOptions: { executablePath } } },
   ],
 });

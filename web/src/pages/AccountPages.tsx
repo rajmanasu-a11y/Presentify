@@ -95,7 +95,7 @@ export function AccountPage() {
 
 export function HelpPage() {
   const { t } = useTranslation();
-  const topics = ['meeting', 'upload', 'versions', 'presenter', 'signIn', 'users', 'org', 'locked'];
+  const topics = ['meeting', 'upload', 'versions', 'presenter', 'qr', 'access', 'participants', 'phone', 'signIn', 'users', 'org', 'locked'];
   return (
     <>
       <PageHeader title={t('help.title')} intro={t('help.intro')} />
