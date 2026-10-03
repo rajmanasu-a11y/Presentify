@@ -32,10 +32,11 @@ ok "Docker $(docker version --format '{{.Server.Version}}') is running."
 
 step "2/5  Configuration"
 lan=$(lan_ip)
+check_address=no; [[ -f .env && -z $public_url ]] && check_address=yes   # only on later runs, when no address was given
 if [[ ! -f .env ]]; then
   port=${port:-8080}
   [[ -n $public_url ]] || public_url="http://${lan:-localhost}:${port}"
-  HTTP_PORT=$port scripts/setup.sh "$public_url" || fail "Could not create the configuration file .env."
+  HTTP_PORT=$port scripts/setup.sh "$public_url" >/dev/null || fail "Could not create the configuration file .env."
   ok "Created .env with new random keys. Keep it private and back it up - it holds the master keys."
 else
   ok "Keeping the existing configuration (.env)."
@@ -44,26 +45,36 @@ else
 fi
 public_url=$(env_get PUBLIC_URL); port=$(env_get HTTP_PORT); port=${port:-8080}
 host=$(printf '%s' "$public_url" | sed -E 's#^[a-z]+://([^/:]+).*#\1#')
-if [[ -n $lan && $host =~ ^[0-9.]+$ && $host != "$lan" ]]; then
+if [[ $check_address == yes && -n $lan && $host =~ ^[0-9.]+$ && $host != "$lan" ]]; then
   warn "QR codes point to $public_url, but this computer's address is now $lan."
-  read -r -p "Change the address to http://${lan}:${port} ? (Y/n) " answer
+  read -r -p "Change the address to http://${lan}:${port} ? (Y/n) " answer || answer=n
   if [[ -z $answer || $answer =~ ^[Yy] ]]; then
     public_url="http://${lan}:${port}"; env_set PUBLIC_URL "$public_url"
     warn "Changed. Show or print the QR codes again from each meeting's 'QR code & access' tab."
   fi
 fi
 
+if [[ $host == localhost ]]; then
+  warn "PUBLIC_URL is $public_url - phones cannot use 'localhost'. Run ./install.sh --public-url http://<this computer's address>:$port"
+else
+  ok "Phones will use $public_url"
+fi
+
 step "3/5  Building and starting Presentify (first time: 10-20 minutes)"
-docker compose up -d --build --wait || { docker compose ps; fail "Presentify did not start. 'docker compose logs --tail 50' shows details."; }
+docker compose up -d --build --wait </dev/null || { docker compose ps; fail "Presentify did not start. 'docker compose logs --tail 50' shows details."; }
 ok "Presentify is running."
 
 step "4/5  Super Admin"
-count=$(docker compose run --rm -T tools superadmin-count 2>/dev/null | tail -1 | tr -d '[:space:]')
+count=$(docker compose run --rm -T tools superadmin-count </dev/null 2>/dev/null | tail -1 | tr -d '[:space:]')
 if [[ $count == 0 ]]; then
   echo "No Super Admin exists yet. Create the first one (it manages organisations)."
-  email=""; until [[ $email =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]; do read -r -p "  E-mail address: " email; done
-  name="";  until [[ ${#name} -ge 2 ]]; do read -r -p "  Full name: " name; done
-  docker compose run --rm -T tools create-superadmin --email "$email" --name "$name" || fail "Could not create the Super Admin."
+  email=""; until [[ $email =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]]; do
+    read -r -p "  E-mail address: " email || fail "No answer given. Run ./install.sh again in a terminal."
+  done
+  name="";  until [[ ${#name} -ge 2 ]]; do
+    read -r -p "  Full name: " name || fail "No answer given. Run ./install.sh again in a terminal."
+  done
+  docker compose run --rm -T tools create-superadmin --email "$email" --name "$name" </dev/null || fail "Could not create the Super Admin."
   warn "Write down the temporary password above. At the first sign-in you choose your own password and set up an authenticator app."
 else
   ok "A Super Admin already exists. (To add another: docker compose run --rm tools create-superadmin)"

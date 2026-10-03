@@ -2,7 +2,7 @@
 # Usage (from the Presentify folder):
 #   powershell -ExecutionPolicy Bypass -File scripts\setup.ps1
 #   powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 -PublicUrl http://192.168.1.20:8080
-param([string]$PublicUrl = "")
+param([string]$PublicUrl = "", [switch]$Quiet)
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
@@ -62,5 +62,7 @@ $content = Get-Content ".env.example" | ForEach-Object {
 # UTF-8 without BOM and Unix line endings, as Docker Compose expects.
 [IO.File]::WriteAllText((Join-Path $root ".env"), (($content -join "`n") + "`n"), (New-Object Text.UTF8Encoding $false))
 
-Write-Host "Created .env (PUBLIC_URL=$PublicUrl)." -ForegroundColor Green
-Write-Host "Next: docker compose up -d --build"
+if (-not $Quiet) {
+  Write-Host "Created .env (PUBLIC_URL=$PublicUrl)." -ForegroundColor Green
+  Write-Host "Next: docker compose up -d --build"
+}

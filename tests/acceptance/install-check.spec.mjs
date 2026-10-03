@@ -16,7 +16,7 @@ test.describe.configure({ mode: 'serial' });
 
 const SA_EMAIL = process.env.CHECK_SA_EMAIL;
 const SA_TEMP = process.env.CHECK_SA_PASSWORD;
-const run = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+const run = `${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '')}-${randomBytes(2).toString('hex')}`;
 const strong = () => `Check#${randomBytes(6).toString('hex')}A1`;
 const state = { saPassword: strong(), adminPassword: process.env.CHECK_ADMIN_PASSWORD || strong(), adminEmail: `check.admin.${run}@demo.presentify.local` };
 const orgName = `Installation check DEMO ${run}`;

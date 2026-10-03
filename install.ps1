@@ -79,12 +79,13 @@ Say "Docker $dockerVersion is running." "Green"
 # ---------------------------------------------------------------------------
 Step "2/6  Configuration"
 $lan = Get-LanAddress
+$checkAddress = (Test-Path ".env") -and -not $PublicUrl   # only on later runs, when no address was given
 if (-not (Test-Path ".env")) {
   if ($Port -le 0) { $Port = 8080 }
   if (-not $PublicUrl) {
     if ($lan) { $PublicUrl = "http://${lan}:$Port" } else { $PublicUrl = "http://localhost:$Port" }
   }
-  & "$PSScriptRoot\scripts\setup.ps1" -PublicUrl $PublicUrl
+  & "$PSScriptRoot\scripts\setup.ps1" -PublicUrl $PublicUrl -Quiet
   if ($LASTEXITCODE -ne 0) { Fail "Could not create the configuration file .env." }
   if ($Port -ne 8080) { Set-EnvValue "HTTP_PORT" "$Port" }
   Say "Created .env with new random keys. Keep this file private and back it up - it holds the master keys." "Green"
@@ -101,7 +102,7 @@ if ($Port -le 0) { $Port = 8080 }
 Step "3/6  Checking the address phones will use"
 $current = $null
 try { $current = ([Uri]$PublicUrl).Host } catch { }
-if ($lan -and $current -and $current -ne $lan -and $current -ne "localhost" -and $current -notmatch '[a-zA-Z]') {
+if ($checkAddress -and $lan -and $current -and $current -ne $lan -and $current -ne "localhost" -and $current -notmatch '[a-zA-Z]') {
   Say "QR codes point to $PublicUrl, but this computer's network address is now $lan." "Yellow"
   $answer = Read-Host "Change the address to http://${lan}:$Port ? (Y/n)"
   if ($answer -eq "" -or $answer -match '^[Yy]') {
@@ -126,14 +127,22 @@ Say "Presentify is running." "Green"
 
 # ---------------------------------------------------------------------------
 Step "5/6  Super Admin"
-$count = (& docker compose run --rm -T tools superadmin-count 2>$null | Select-Object -Last 1)
+$count = ($null | & docker compose run --rm -T tools superadmin-count 2>$null | Select-Object -Last 1)
 if ("$count".Trim() -eq "0") {
   Say "No Super Admin exists yet. Create the first one (it manages organisations; it is not used for meetings)." "White"
   $email = ""
-  while ($email -notmatch '^[^\s@]+@[^\s@]+\.[^\s@]+$') { $email = (Read-Host "  E-mail address").Trim() }
+  $tries = 0
+  while ($email -notmatch '^[^\s@]+@[^\s@]+\.[^\s@]+$') {
+    if (++$tries -gt 5) { Fail "No valid e-mail address given. Run the installer again." }
+    $email = "$(Read-Host "  E-mail address")".Trim()
+  }
   $name = ""
-  while ($name.Length -lt 2) { $name = (Read-Host "  Full name").Trim() }
-  & docker compose run --rm -T tools create-superadmin --email $email --name $name
+  $tries = 0
+  while ($name.Length -lt 2) {
+    if (++$tries -gt 5) { Fail "No name given. Run the installer again." }
+    $name = "$(Read-Host "  Full name")".Trim()
+  }
+  $null | & docker compose run --rm -T tools create-superadmin --email $email --name $name
   if ($LASTEXITCODE -ne 0) { Fail "Could not create the Super Admin." }
   Say "Write down the temporary password above. At the first sign-in you choose your own password and set up an authenticator app (Google or Microsoft Authenticator) on your phone." "Yellow"
 } else {

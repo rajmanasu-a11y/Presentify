@@ -139,7 +139,8 @@ Use DEMO names. Times are India time.
 
 | ID | Steps | Expected | ✔/✘ |
 |---|---|---|---|
-| A1 | `docker compose run --rm tools create-superadmin`, enter your e-mail and name | a temporary password is shown | |
+| A1 | Double-click `install.cmd`; when asked, enter your e-mail and name | Presentify starts; a temporary password and the addresses to open are shown; the browser opens | |
+| A1b | Double-click `install.cmd` a second time | *Keeping the existing configuration*, *A Super Admin already exists* — nothing is lost | |
 | A2 | Open `PUBLIC_URL` on the laptop; sign in with the temporary password | asked to choose a new password | |
 | A3 | Try `password123` as the new password | refused with a plain explanation (≥ 10 characters, upper, lower, digit) | |
 | A4 | Choose a strong password; scan the QR code with the authenticator app; type the code | *Presentify administration* console opens | |
